@@ -12,6 +12,11 @@ int main()
 
     board = BitBoardMakeWhiteSquares();
     BitBoardPrint( board );
+    printf( "\n" );
+
+    board = BitBoardMakeBlackSquares();
+    BitBoardPrint( board );
+    printf( "\n" );
 
     State_t state;
     state.Init();
