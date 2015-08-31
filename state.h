@@ -40,14 +40,16 @@ struct State_t
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
         {
             StateBitBoard_t *pBoard = &_player[ iPlayer ];
-            
+
             for( int piece = PIECE_PAWN; piece < NUM_PIECES; piece++ )
             {
-                printf( "= %c%c = %08X%08X\n", aPLAYERS[ iPlayer ], aPIECES[ piece ]
-                    , (pBoard->_board[ piece ] >> 32) & 0xFFFFFFFF
-                    , (pBoard->_board[ piece ]      ) & 0xFFFFFFFF
-                );
-                BitBoardPrint( pBoard->_board[ piece ], aPIECES[ piece ] );
+                bitboard_t board = pBoard->_board[ piece ];
+
+                uint32_t b1 = board >> 32;
+                uint32_t b0 = board >>  0;
+
+                printf( "= %c%c = %08X%08X\n", aPLAYERS[ iPlayer ], aPIECES[ piece ], b1, b0 );
+                BitBoardPrint( board, aPIECES[ piece ] );
                 printf( "\n" );
             }
         }

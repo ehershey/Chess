@@ -11,10 +11,12 @@ int main()
     bitboard_t board;
 
     board = BitBoardMakeWhiteSquares();
+    printf( "White Squares\n" );
     BitBoardPrint( board );
     printf( "\n" );
 
     board = BitBoardMakeBlackSquares();
+    printf( "Black Squares\n" );
     BitBoardPrint( board );
     printf( "\n" );
 
