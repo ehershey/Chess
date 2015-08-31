@@ -36,7 +36,7 @@ const char aROW  [8] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' }; // Row
 
 void BitBoardPrint( const bitboard_t board, const char solidPiece = 'X', const bool bPrintRankFile = true )
 {
-    static char aPieces[2] = { '_', '?' }; // Empty, Solid
+    static char aPieces[2] = { '.', '?' }; // Empty, Solid
     aPieces[ 1 ] = solidPiece;
 
     const int  BOARD_SIZE = 11*9 + 1; // BOARD_MARK is largest

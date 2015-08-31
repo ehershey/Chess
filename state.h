@@ -5,9 +5,9 @@ struct StateBitBoard_t
 
 struct State_t
 {
-    StateBitBoard_t _player[ 2 ];
-    int               _flags;
-    int               _turn;
+    StateBitBoard_t _player[ NUM_PLAYERS ];
+    int             _flags;
+    int             _turn;
 
     void Init()
     {
@@ -43,6 +43,10 @@ struct State_t
             
             for( int piece = PIECE_PAWN; piece < NUM_PIECES; piece++ )
             {
+                printf( "= %c%c = %08X%08X\n", aPLAYERS[ iPlayer ], aPIECES[ piece ]
+                    , (pBoard->_board[ piece ] >> 32) & 0xFFFFFFFF
+                    , (pBoard->_board[ piece ]      ) & 0xFFFFFFFF
+                );
                 BitBoardPrint( pBoard->_board[ piece ], aPIECES[ piece ] );
                 printf( "\n" );
             }
