@@ -45,8 +45,11 @@
                             File A..H
   Useful links:
 
+    * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/rep.html
     * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/physical.html
     * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/nonsliding.html
+    * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/table_clearrank.html
+
     * http://www.dummies.com/how-to/content/naming-ranks-and-files-in-chess.html
 */
 
