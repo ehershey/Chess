@@ -17,7 +17,7 @@ struct PrettyPrintBoard_t
         memset( _cells, PIECE_EMPTY, sizeof( _cells ) );
     }
 
-    void Print()
+    void Print( bool bPrintRankFile = true )
     {
         char *p = _cells;
 
@@ -146,7 +146,7 @@ struct State_t
         }
     }
 
-    void PrettyPrintBoard()
+    void PrettyPrintBoard( bool bPrintRankFile = true )
     {
         PrettyPrintBoard_t board;
         board.Init();
@@ -157,7 +157,7 @@ struct State_t
             pState->BitBoardToPrettyPrint( iPlayer, &board );
         }
 
-        board.Print();
+        board.Print( bPrintRankFile );
 
     }
 };
