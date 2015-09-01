@@ -307,20 +307,16 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
       D. .A
       . x .
       E. .H
-       F.G
+      .F.G.
 
     */
+    bitboard_t origin = BitBoardMakeLocation( rankfile );
+
     bitboard_t fileA  = ~BitBoardMakeFile( 0 );
     bitboard_t fileB  = ~BitBoardMakeFile( 1 );
     bitboard_t fileG  = ~BitBoardMakeFile( 6 );
     bitboard_t fileH  = ~BitBoardMakeFile( 7 );
 
-    bitboard_t rank8  = ~BitBoardMakeRank( 7 );
-    bitboard_t rank7  = ~BitBoardMakeRank( 6 );
-    bitboard_t rank2  = ~BitBoardMakeRank( 1 );
-    bitboard_t rank1  = ~BitBoardMakeRank( 0 );
-
-    bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t left2  = (origin & fileA & fileB) << 2;
     bitboard_t left1  = (origin & fileA        ) << 1;
     bitboard_t right1 = (origin &         fileH) >> 1;
@@ -379,8 +375,6 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
 {
     bitboard_t fileA  = ~BitBoardMakeFile( 0 );
     bitboard_t fileH  = ~BitBoardMakeFile( 7 );
-    bitboard_t rank8  = ~BitBoardMakeRank( 7 );
-    bitboard_t rank1  = ~BitBoardMakeRank( 0 );
 
     bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t left   = (origin & fileA) << 1;
