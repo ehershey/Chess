@@ -1,8 +1,48 @@
 // Pretty Print
-const char CELL_W  [] = "\x1B[30;47m"; // Black on White
-const char CELL_B  [] = "\x1B[37;40m"; // White on Black
-const char CELL_EOL[] = "\x1B[0m";
-const int  CELLS_SIZE = 64 * 2; // 8x8 * 2 chars/cell
+    char CELL_W  [] = "\x1B[30;47m"; // Black on White
+    char CELL_B  [] = "\x1B[37;40m"; // White on Black
+    char CELL_EOL[] = "\x1B[0m";
+    // Version 1: char[8x8*2] // 128 bytes = 2 bytes/cell
+    // Version 2: char[8*8]   //  64 bytes = 1 byte/cell -- encode black as 8+piece
+    // Version 3: int32[8]    //  32 bytes = 1 nibble/cell
+    const int  CELLS_SIZE = 64;
+
+struct PrettyPrintBoard_t
+{
+    char _cells[ CELLS_SIZE ]; // Version 2: 1 byte/cell
+    //uint32_t _cells[ 8 ];    // Version 3: 1 nibble/cell // 8 rows of 4 bits/piece
+
+    void Init()
+    {
+        memset( _cells, PIECE_EMPTY, sizeof( _cells ) );
+    }
+
+    void Print()
+    {
+        char *p = _cells;
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            int iPiece  = *p & 7;
+            int iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player
+
+            char  player = aPLAYERS[ iPlayer ];
+            char  piece  = aPIECES [ iPiece  ];
+
+            printf( "%s%c%c"
+                , (cell + (cell/8)) & 1 ? CELL_B : CELL_W
+                , player
+                , piece
+            );
+
+            if( cell && ((cell & 7) == 7) )
+                printf( "%s\n", CELL_EOL );
+
+            p++;
+        }
+    }
+};
+
 
 struct StateBitBoard_t
 {
@@ -25,34 +65,38 @@ struct StateBitBoard_t
         }
     }
 
-    void MakePrettyBoard( int iPlayer, char board[ CELLS_SIZE ] )
+    void BitBoardToPrettyPrint( int iPlayer, PrettyPrintBoard_t *board_ )
     {
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
             bitboard_t bits = _aBoards[ iPiece ];
             bitboard_t temp ;
 
-            char       player = aPLAYERS[ iPlayer ];
-            char       piece  = aPIECES [ iPiece  ];
-
             // Enumerate though all bits, filling in the board
-            char *p = board;
+            char *p = board_->_cells;
 
             for( int y = 7; y >= 0; y-- )
             {
-                temp = bits >> (8 * y);
+                temp = bits >> (8 * y); // get 8 bits for row Y
                 for( int x = 7; x >= 0; x-- )
                 {
                     if( (temp >> x) & 1 )
-                    {
-                        *p++ = player;
-                        *p++ = piece ;
-                    }
-                    else
-                        p += 2;
+                        *p = iPiece + (8*iPlayer);
+
+                    p++;
                 }
             }
         }
+    }
+
+    bitboard_t GetBoardAllPieces()
+    {
+        bitboard_t board = 0;
+
+        for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
+            board  |= _aBoards[ iPiece ];
+
+        return board;
     }
 
 };
@@ -102,29 +146,19 @@ struct State_t
         }
     }
 
-    char* PrettyPrintBoard()
+    void PrettyPrintBoard()
     {
-        static char board[ CELLS_SIZE ];
-        memset( board, ' ', CELLS_SIZE );
+        PrettyPrintBoard_t board;
+        board.Init();
 
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
         {
             StateBitBoard_t *pState = &_player[ iPlayer ];
-            pState->MakePrettyBoard( iPlayer, board );
+            pState->BitBoardToPrettyPrint( iPlayer, &board );
         }
 
-        for( int cell = 0; cell < 64; cell++ )
-        {
-            printf( "%s%c%c"
-                , (cell + (cell/8)) & 1 ? CELL_B : CELL_W
-                , board[ cell*2 + 0 ]
-                , board[ cell*2 + 1 ]
-            );
-            if( cell && ((cell & 7) == 7) )
-                printf( "%s\n", CELL_EOL );
-        }
+        board.Print();
 
-        return board;
     }
 };
 
