@@ -321,8 +321,6 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
     bitboard_t right2 = (origin & fileG & fileH) >> 2;
 
     bitboard_t above2 = origin << 16;
-    bitboard_t above1 = origin <<  8;
-    bitboard_t below1 = origin >>  8;
     bitboard_t below2 = origin >> 16;
 
     bitboard_t A = (right2        ) << 8; // this is simply <<  6
