@@ -45,6 +45,21 @@ int main()
     }
 #endif
 
+#if 1
+    printf( "= White Pawn Moves =\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            int col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+            board = BitBoardMovesWhitePawn( rankfile );
+            BitBoardPrint( board );
+            printf( "\n" );
+        }
+#endif
 
 #if 0
     printf( "= Queen Moves =\n" );
@@ -79,7 +94,7 @@ int main()
 #endif
 
 
-#if 1
+#if 0
     printf( "= Knight Moves =\n" );
 
         //board = BitBoardMovesColorKnight( 0x33 ); // D4
@@ -116,6 +131,22 @@ int main()
 
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
             board = BitBoardMovesColorBishop( rankfile );
+            BitBoardPrint( board );
+            printf( "\n" );
+        }
+#endif
+
+#if 1
+    printf( "= King Moves =\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            int col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+            board = BitBoardMovesColorKing( rankfile );
             BitBoardPrint( board );
             printf( "\n" );
         }
