@@ -113,6 +113,7 @@ enum StateFlags_e
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ];
+    float           _eval ;
     uint16_t        _turn ;
     uint8_t         _flags;
     uint8_t         _from ; // ROWCOL
@@ -189,7 +190,7 @@ struct State_t
             {
                 case PIECE_QUEEN : movesAll = BitBoardMovesColorQueen ( kingRankFile ); break;
                 case PIECE_BISHOP: movesAll = BitBoardMovesColorBishop( kingRankFile ); break;
-                case PIECE_KNIGHT: movesAll = BitBoardMovesColorKnight( kingRankFile ); break; 
+                case PIECE_KNIGHT: movesAll = BitBoardMovesColorKnight( kingRankFile ); break;
                 case PIECE_ROOK  : movesAll = BitBoardMovesColorRook  ( kingRankFile ); break;
                 case PIECE_PAWN  :
                     if( iEnemy == PLAYER_BLACK )
@@ -211,7 +212,14 @@ struct State_t
 
         // get the piece type
 
-        return false; // FIXME:       
+        return false; // FIXME:
+    }
+
+    float Eval()
+    {
+        _eval = 0.f;
+
+        return _eval;
     }
 };
 
