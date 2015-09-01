@@ -327,14 +327,14 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
     bitboard_t below1 = origin >>  8;
     bitboard_t below2 = origin >> 16;
 
-    bitboard_t A = (right2        ) << 8;
-    bitboard_t B = (above2 & fileH) >> 1;
-    bitboard_t C = (above2 & fileA) << 1;
-    bitboard_t D = (left2         ) << 8;
-    bitboard_t E = (left2         ) >> 8;
-    bitboard_t F = (below2 & fileA) << 1;
-    bitboard_t G = (below2 & fileH) >> 1;
-    bitboard_t H = (right2        ) >> 8;
+    bitboard_t A = (right2        ) << 8; // this is simply <<  6
+    bitboard_t B = (above2 & fileH) >> 1; // this is simply << 15
+    bitboard_t C = (above2 & fileA) << 1; // this is simply << 17
+    bitboard_t D = (left2         ) << 8; // this is simply << 10
+    bitboard_t E = (left2         ) >> 8; // this is simply >>  6
+    bitboard_t F = (below2 & fileA) << 1; // this is simply >> 15
+    bitboard_t G = (below2 & fileH) >> 1; // this is simply >> 17
+    bitboard_t H = (right2        ) >> 8; // this is simply >> 10
 
     bitboard_t board = A | B | C | D | E | F | G | H;
     return board & ~origin;
