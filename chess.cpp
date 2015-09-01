@@ -24,6 +24,8 @@ int main()
     state.Init();
     state.Dump();
 
+    state.PrettyPrintBoard();
+
     return 0;
 }
 
