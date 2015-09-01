@@ -70,22 +70,14 @@ struct StateBitBoard_t
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
             bitboard_t bits = _aBoards[ iPiece ];
-            bitboard_t temp ;
+            bitboard_t mask = 0x8000000000000000UL;
 
             // Enumerate though all bits, filling in the board
             char *p = board_->_cells;
 
-            for( int y = 7; y >= 0; y-- )
-            {
-                temp = bits >> (8 * y); // get 8 bits for row Y
-                for( int x = 7; x >= 0; x-- )
-                {
-                    if( (temp >> x) & 1 )
-                        *p = iPiece + (8*iPlayer);
-
-                    p++;
-                }
-            }
+            for( int iCell = 0; iCell < 64; iCell++, p++, mask >>= 1 )
+                if( bits & mask )
+                    *p = iPiece + (8*iPlayer);
         }
     }
 
