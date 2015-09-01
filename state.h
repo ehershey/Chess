@@ -21,21 +21,21 @@ struct PrettyPrintBoard_t
     {
         char *p = _cells;
 
-        for( int cell = 0; cell < 64; cell++ )
+        for( int iCell = 0; iCell < 64; iCell++ )
         {
-            int iPiece  = *p & 7;
-            int iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player
+            int  iPiece  = *p & 7;
+            int  iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player
 
-            char  player = aPLAYERS[ iPlayer ];
-            char  piece  = aPIECES [ iPiece  ];
+            char cPlayer = aPLAYERS[ iPlayer ];
+            char cPiece  = aPIECES [ iPiece  ];
 
             printf( "%s%c%c"
-                , (cell + (cell/8)) & 1 ? CELL_B : CELL_W
-                , player
-                , piece
+                , (iCell + ((iCell/8)) & 1) ? CELL_B : CELL_W
+                , cPlayer
+                , cPiece
             );
 
-            if( cell && ((cell & 7) == 7) )
+            if (iCell && ((iCell & 7) == 7))
                 printf( "%s\n", CELL_EOL );
 
             p++;
