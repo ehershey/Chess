@@ -312,28 +312,23 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
     */
     bitboard_t origin = BitBoardMakeLocation( rankfile );
 
+    // Clip Column Masks
     bitboard_t fileA  = ~BitBoardMakeFile( 0 );
     bitboard_t fileB  = ~BitBoardMakeFile( 1 );
     bitboard_t fileG  = ~BitBoardMakeFile( 6 );
     bitboard_t fileH  = ~BitBoardMakeFile( 7 );
 
-    bitboard_t left2  = (origin & fileA & fileB) << 2;
-    bitboard_t right2 = (origin & fileG & fileH) >> 2;
-
-    bitboard_t above2 = origin << 16;
-    bitboard_t below2 = origin >> 16;
-
-    bitboard_t A = (right2        ) << 8; // this is simply <<  6
-    bitboard_t B = (above2 & fileH) >> 1; // this is simply << 15
-    bitboard_t C = (above2 & fileA) << 1; // this is simply << 17
-    bitboard_t D = (left2         ) << 8; // this is simply << 10
-    bitboard_t E = (left2         ) >> 8; // this is simply >>  6
-    bitboard_t F = (below2 & fileA) << 1; // this is simply >> 15
-    bitboard_t G = (below2 & fileH) >> 1; // this is simply >> 17
-    bitboard_t H = (right2        ) >> 8; // this is simply >> 10
+    bitboard_t A = (origin <<  6) & fileA & fileB; // - 8+2
+    bitboard_t B = (origin << 15) & fileA        ; // -16+1
+    bitboard_t C = (origin << 17) &         fileH; // -16-1
+    bitboard_t D = (origin << 10) & fileG & fileH; // - 8-2
+    bitboard_t E = (origin >>  6) & fileG & fileH; // + 8-2
+    bitboard_t F = (origin >> 15) &         fileH; // +16-1
+    bitboard_t G = (origin >> 17) & fileA        ; // +16+1
+    bitboard_t H = (origin >> 10) & fileA & fileB; // + 8+2
 
     bitboard_t board = A | B | C | D | E | F | G | H;
-    return board & ~origin;
+    return board;
 }
 
 
