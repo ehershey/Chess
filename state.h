@@ -21,13 +21,13 @@ struct PrettyPrintBoard_t
     {
         char *p = _cells;
 
-        for( int iCell = 0; iCell < 64; iCell++ )
+        for( int iCell = 0; iCell < 64; iCell++, p++ )
         {
             char iCol    = iCell & 7;
             char iRow    = iCell / 8;
 
             int  iPiece  = *p & 7;
-            int  iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player
+            int  iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player -> player 3 "blank"
 
             char cPlayer = aPLAYERS[ iPlayer ];
             char cPiece  = aPIECES [ iPiece  ];
@@ -43,8 +43,6 @@ struct PrettyPrintBoard_t
 
             if (iCell && (iCol == 7))
                 printf( "%s\n", CELL_EOL );
-
-            p++;
         }
 
         if (bPrintRankFile )
@@ -106,6 +104,12 @@ struct StateBitBoard_t
 
 };
 
+enum StateFlags_e
+{
+     STATE_CHECK       = (1 << 0)
+    ,STATE_HAS_CASTLED = (1 << 1)
+};
+
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ];
@@ -163,6 +167,51 @@ struct State_t
         }
 
         board.Print( bPrintRankFile );
+    }
+
+    bool IsCheck()
+    {
+        uint8_t kingRankFile = 0; // FIXME: 
+        uint8_t origin       = BitBoardMakeLocation( kingRankFile );
+        uint8_t iPlayer      = _turn   & 1;
+        uint8_t iEnemy       = iPlayer ^ 1;
+
+        // From the King's location
+        // see if any of the enemy pieces have Line-of-Sight to us
+
+        for( int iPiece = PIECE_QUEEN; iPiece > PIECE_PAWN; iPiece-- )
+        {
+            bitboard_t movesAll       = 0;
+            bitboard_t movesPotential = 0;
+            bitboard_t movesValid     = 0;
+
+            switch( iPiece )
+            {
+                case PIECE_QUEEN : movesAll = BitBoardMovesColorQueen ( kingRankFile ); break;
+                case PIECE_BISHOP: movesAll = BitBoardMovesColorBishop( kingRankFile ); break;
+                case PIECE_KNIGHT: movesAll = BitBoardMovesColorKnight( kingRankFile ); break; 
+                case PIECE_ROOK  : movesAll = BitBoardMovesColorRook  ( kingRankFile ); break;
+                case PIECE_PAWN  :
+                    if( iEnemy == PLAYER_BLACK )
+                        movesAll = BitBoardMovesWhitePawn( kingRankFile );
+                    else
+                        movesAll = BitBoardMovesBlackPawn( kingRankFile );
+                    break;
+
+                movesPotential = movesAll & movesPotential;
+            }
+        } // for piece
+
+        return false; // FIXME:
+    }
+
+    bool IsValidMove( uint8_t fromRankFile, uint8_t toRankFile )
+    {
+        int iPiece = 0;
+
+        // get the piece type
+
+        return false; // FIXME:       
     }
 };
 
