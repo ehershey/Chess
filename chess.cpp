@@ -83,10 +83,12 @@ int main()
     printf( "= Knight Moves =\n" );
 
         //board = BitBoardMovesColorKnight( 0x33 ); // D4
-        board = BitBoardMovesColorKnight( 0x30 ); // A4
-        BitBoardPrint( board );
-        printf( "\n" );
-if(0)
+        //board = BitBoardMovesColorKnight( 0x30 ); // A4
+        //board = BitBoardMovesColorKnight( 0x70 ); // A8
+        //BitBoardPrint( board );
+        //printf( "\n" );
+
+//if(1)
         for( int cell = 0; cell < 64; cell++ )
         {
             int col, row, rankfile;
