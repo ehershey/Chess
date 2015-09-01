@@ -255,21 +255,6 @@ bitboard_t BitBoardMakeDiagonalRight( uint8_t rankfile )
 }
 
 
-bitboard_t BitBoardMovesWhitePawn( uint8_t rankfile )
-{
-    uint8_t row = (rankfile >> 4) & 7; // rank
-    uint8_t col = (rankfile >> 0) & 7; // file
-
-    bitboard_t origin = BitBoardMakeLocation( rankfile );
-    bitboard_t board  = origin << 8;
-
-    if( row == 1 ) // can move 2 tiles if haven't moved
-        board |= (board << 8);
-
-    return board & ~origin;
-}
-
-
 bitboard_t BitBoardMovesBlackPawn( uint8_t rankfile )
 {
     uint8_t row = (rankfile >> 4) & 7; // rank
@@ -280,6 +265,21 @@ bitboard_t BitBoardMovesBlackPawn( uint8_t rankfile )
 
     if( row == 6 ) // can move 2 tiles if haven't moved
         board |= (board >> 8); // Optimization: Don't need: & rank8
+
+    return board & ~origin;
+}
+
+
+bitboard_t BitBoardMovesWhitePawn( uint8_t rankfile )
+{
+    uint8_t row = (rankfile >> 4) & 7; // rank
+    uint8_t col = (rankfile >> 0) & 7; // file
+
+    bitboard_t origin = BitBoardMakeLocation( rankfile );
+    bitboard_t board  = origin << 8;
+
+    if( row == 1 ) // can move 2 tiles if haven't moved
+        board |= (board << 8);
 
     return board & ~origin;
 }
@@ -386,14 +386,14 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
     bitboard_t left   = (origin & fileA) << 1;
     bitboard_t right  = (origin & fileH) >> 1;
 
-    bitboard_t above  = (origin & rank8) << 8;
-    bitboard_t below  = (origin & rank1) >> 8;
+    bitboard_t above  = origin << 8;
+    bitboard_t below  = origin >> 8;
 
-    bitboard_t ul     = (left & rank8) << 8;
-    bitboard_t bl     = (left & rank1) >> 8;
+    bitboard_t ul     = left << 8;
+    bitboard_t bl     = left >> 8;
 
-    bitboard_t ur     = (right & rank8) << 8;
-    bitboard_t br     = (right & rank1) >> 8;
+    bitboard_t ur     = right << 8;
+    bitboard_t br     = right >> 8;
 
     bitboard_t board = 0
         | ul | above | ur
