@@ -29,6 +29,9 @@ struct PrettyPrintBoard_t
             char cPlayer = aPLAYERS[ iPlayer ];
             char cPiece  = aPIECES [ iPiece  ];
 
+            if (bPrintRankFile && ((iCell & 7) == 0))
+                printf( "%c ", aRANK[ 7 - iCell/8 ] );
+
             printf( "%s%c%c"
                 , (iCell + ((iCell/8)) & 1) ? CELL_B : CELL_W
                 , cPlayer
@@ -39,6 +42,13 @@ struct PrettyPrintBoard_t
                 printf( "%s\n", CELL_EOL );
 
             p++;
+        }
+
+        if (bPrintRankFile )
+        {
+             printf( "  " );
+             for( int x = 0; x < 8; x++ )
+               printf( "%c ", aFILE[ x ] );
         }
     }
 };
