@@ -1,7 +1,8 @@
+// Pretty Print
 const char CELL_W  [] = "\x1B[30;47m"; // Black on White
 const char CELL_B  [] = "\x1B[37;40m"; // White on Black
 const char CELL_EOL[] = "\x1B[0m";
-const int  FANCY  = 64 * 2;
+const int  CELLS_SIZE = 64 * 2; // 8x8 * 2 chars/cell
 
 struct StateBitBoard_t
 {
@@ -24,7 +25,7 @@ struct StateBitBoard_t
         }
     }
 
-    void MakePrettyBoard( int iPlayer, char board[ FANCY ] )
+    void MakePrettyBoard( int iPlayer, char board[ CELLS_SIZE ] )
     {
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
@@ -34,7 +35,7 @@ struct StateBitBoard_t
             char       player = aPLAYERS[ iPlayer ];
             char       piece  = aPIECES [ iPiece  ];
 
-            // Enumerate though all bits, filling in the board            
+            // Enumerate though all bits, filling in the board
             char *p = board;
 
             for( int y = 7; y >= 0; y-- )
@@ -103,8 +104,8 @@ struct State_t
 
     char* PrettyPrintBoard()
     {
-        static char board[ FANCY ];
-        memset( board, ' ', FANCY );
+        static char board[ CELLS_SIZE ];
+        memset( board, ' ', CELLS_SIZE );
 
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
         {
