@@ -121,7 +121,7 @@ const uint8_t aColMask[8] = {
 
 bitboard_t BitBoardMakeFile( uint8_t col )
 {
-    bitboard_t t = aColMask[ col ]; // 1 << (8 - col)
+    bitboard_t t = (bitboard_t) aColMask[ col ]; // 1 << (8 - col)
     bitboard_t board = 0
         | t << 56
         | t << 48
@@ -163,7 +163,7 @@ bitboard_t BitBoardMakeLocation( uint8_t rankfile )
     uint8_t row = (rankfile >> 4) & 7; // rank
     uint8_t col = (rankfile >> 0) & 7; // file
 
-    bitboard_t board = aColMask[ col ] << (8 * row);
+    bitboard_t board = ((bitboard_t) aColMask[ col ]) << (8 * row);
     return board;
 }
 
@@ -326,22 +326,21 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
     bitboard_t right1 = (origin &         fileH) >> 1;
     bitboard_t right2 = (origin & fileG & fileH) >> 2;
 
-    bitboard_t above2 = (origin & rank8 & rank7) << 16;
-    bitboard_t above1 = (origin &         rank7) << 8;
-    bitboard_t below1 = (origin &         rank1) >> 8;
-    bitboard_t below2 = (origin & rank2 & rank1) >> 16;
+    bitboard_t above2 = origin << 16;
+    bitboard_t above1 = origin <<  8;
+    bitboard_t below1 = origin >>  8;
+    bitboard_t below2 = origin >> 16;
 
-    bitboard_t A = (right2 & rank8) << 8;
+    bitboard_t A = (right2        ) << 8;
     bitboard_t B = (above2 & fileH) >> 1;
     bitboard_t C = (above2 & fileA) << 1;
-    bitboard_t D = (left2  & rank8) << 8;
-    bitboard_t E = (left2  & rank1) >> 8;
+    bitboard_t D = (left2         ) << 8;
+    bitboard_t E = (left2         ) >> 8;
     bitboard_t F = (below2 & fileA) << 1;
     bitboard_t G = (below2 & fileH) >> 1;
-    bitboard_t H = (right2 & rank1) >> 8;
+    bitboard_t H = (right2        ) >> 8;
 
-//    bitboard_t board = A | B | C | D | E | F | G | H;
-bitboard_t board = A;
+    bitboard_t board = A | B | C | D | E | F | G | H;
     return board & ~origin;
 }
 
