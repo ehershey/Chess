@@ -23,22 +23,25 @@ struct PrettyPrintBoard_t
 
         for( int iCell = 0; iCell < 64; iCell++ )
         {
+            char iCol    = iCell & 7;
+            char iRow    = iCell / 8;
+
             int  iPiece  = *p & 7;
             int  iPlayer = *p / 8 + 2*(iPiece == PIECE_EMPTY); // if piece empty, don't display player
 
             char cPlayer = aPLAYERS[ iPlayer ];
             char cPiece  = aPIECES [ iPiece  ];
 
-            if (bPrintRankFile && ((iCell & 7) == 0))
+            if (bPrintRankFile && (iCol == 0))
                 printf( "%c ", aRANK[ 7 - iCell/8 ] );
 
             printf( "%s%c%c"
-                , (iCell + ((iCell/8)) & 1) ? CELL_B : CELL_W
+                , ((iCell + iRow) & 1) ? CELL_B : CELL_W
                 , cPlayer
                 , cPiece
             );
 
-            if (iCell && ((iCell & 7) == 7))
+            if (iCell && (iCol == 7))
                 printf( "%s\n", CELL_EOL );
 
             p++;
@@ -160,7 +163,6 @@ struct State_t
         }
 
         board.Print( bPrintRankFile );
-
     }
 };
 
