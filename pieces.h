@@ -19,5 +19,4 @@ enum Player_e
     NUM_PLAYERS
 };
 
-const char aPLAYERS[] = "WB";
-
+const char aPLAYERS[] = "WB "; // Player 3 is to display empty cell
