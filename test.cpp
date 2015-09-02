@@ -223,6 +223,39 @@ int main()
     }
 #endif
 
+#if 0
+        bitboard_t board;
+
+        uint8_t rankfile = 0x00;
+        board = BitBoardMakeLocation( rankfile ); // BitBoardMakeLocation // BitBoardMovesColorKing
+
+        uint8_t kingRF = BitBoardToRankFile( board );
+        printf( "rank_file: %02X %s %02X kingRF\n", rankfile, (rankfile == kingRF) ? "==" : "!=", kingRF );
+
+        BitBoardPrint( board );
+    printf( "\n" );
+#endif
+
+#if 1
+        bitboard_t board;
+        printf( "= King Position to Rank File =\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+            board = BitBoardMakeLocation( rankfile );
+            uint8_t kingRF = BitBoardToRankFile( board );
+            printf( "rank_file: %02X %s %02X kingRF\n", rankfile, (rankfile == kingRF) ? "==" : "!=", kingRF );
+
+            BitBoardPrint( board );
+            printf( "\n" );
+        }
+#endif
+
     return 0;
 }
 
