@@ -54,21 +54,6 @@
 */
 
 
-// i -> x,y
-void CellToColRow( const int cell, int& col_, int& row_ )
-{
-    col_ = cell & 7;
-    row_ = cell / 8;
-}
-
-
-uint8_t ColRowToRankFile( const int col, const int row )
-{
-    uint8_t rankfile = (row << 4) + col;
-    return rankfile;
-}
-
-
 typedef uint64_t bitboard_t;
 
 bitboard_t BitBoardMakeWhiteSquares () { bitboard_t board = 0xAA55AA55AA55AA55UL; return board; }
