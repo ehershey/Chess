@@ -193,6 +193,11 @@ struct State_t
             bitboard_t movesPotential = 0;
             bitboard_t movesValid     = 0;
 
+(void) pStateThem;
+(void) movesAll;
+(void) movesPotential;
+(void) movesValid;
+
             switch( iPiece )
             {
                 case PIECE_QUEEN : movesAll = BitBoardMovesColorQueen ( kingRankFile ); break;
@@ -216,8 +221,18 @@ struct State_t
     bool IsValidMove( uint8_t fromRankFile, uint8_t toRankFile )
     {
         int iPiece = 0;
+        bitboard_t origin = BitBoardMakeLocation( fromRankFile );
+        bitboard_t dest   = BitBoardMakeLocation( toRankFile );
 
         // get the piece type
+        for( int iPiece = PIECE_QUEEN; iPiece > PIECE_PAWN; iPiece-- )
+        {
+        }
+
+(void) origin;
+(void) dest;
+(void) iPiece;
+
 
         return false; // FIXME:
     }
