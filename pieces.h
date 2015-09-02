@@ -22,4 +22,4 @@ enum Player_e
 const char aPLAYERS[] = "WB "; // Player 3 is to display empty cell
 
 // http://www.stmintz.com/ccc/index.php?id=424966
-const int MAX_MOVES = 256; // Theoritical max moves from any position is ~218
+const int MAX_POSITION_MOVES = 256; // Theoritical max moves from any position is ~218
