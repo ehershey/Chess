@@ -175,7 +175,9 @@ bitboard_t BitBoardMakeLocation( uint8_t rankfile )
 uint8_t BitBoardToRankFile( const bitboard_t board )
 {
     // Optimization: Find First Set Bit Position (63=MSB, 0=LSB)
-    // C++: __builtin_clz
+    // C++: GCC: __builtin_clz
+    //      MS : #include <intrin.h> // _BitScanReverse( &DWORD, val ); _BitScanReverse64( &output, val );
+    //      Clang: http://clang.llvm.org/doxygen/lzcntintrin_8h_source.html
     // Asm: x86: BSR    Bit Scan Reverse
     //      PPC: cntlz  Count Leading Zeroes
 
