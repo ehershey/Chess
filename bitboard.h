@@ -246,7 +246,6 @@ bitboard_t BitBoardMakeDiagonalRight( uint8_t rankfile )
 bitboard_t BitBoardMovesBlackPawn( uint8_t rankfile )
 {
     uint8_t row = (rankfile >> 4) & 7; // rank
-    uint8_t col = (rankfile >> 0) & 7; // file
 
     bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t board  = origin >> 8;
@@ -261,7 +260,6 @@ bitboard_t BitBoardMovesBlackPawn( uint8_t rankfile )
 bitboard_t BitBoardMovesWhitePawn( uint8_t rankfile )
 {
     uint8_t row = (rankfile >> 4) & 7; // rank
-    uint8_t col = (rankfile >> 0) & 7; // file
 
     bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t board  = origin << 8;
@@ -322,9 +320,6 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
 
 bitboard_t BitBoardMovesColorBishop( uint8_t rankfile )
 {
-    uint8_t row = (rankfile >> 4) & 7; // rank
-    uint8_t col = (rankfile >> 0) & 7; // file
-
     bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t diagL  = BitBoardMakeDiagonalLeft ( rankfile );
     bitboard_t diagR  = BitBoardMakeDiagonalRight( rankfile );
