@@ -1,4 +1,4 @@
-// Pretty Print
+ // Pretty Print
     char CELL_W  [] = "\x1B[30;47m"; // Black on White
     char CELL_B  [] = "\x1B[37;40m"; // White on Black
     char CELL_EOL[] = "\x1B[0m";
@@ -106,18 +106,21 @@ struct StateBitBoard_t
 
 enum StateFlags_e
 {
-     STATE_CHECK       = (1 << 0)
-    ,STATE_HAS_CASTLED = (1 << 1)
+     STATE_CHECK             = (1 << 0)
+    ,STATE_CAN_CASTLE_K_SIDE = (1 << 1)
+    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 2)
+  //,STATE_HAS_CASTLED       = (1 << 3) // CanCastle( _flags & (STATE_CAN_CASTLE_K_SIDE|STATE_CAN_CASTLE_Q_SIDE) )
 };
 
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ];
-    float           _eval ;
-    uint16_t        _turn ;
-    uint8_t         _flags;
-    uint8_t         _from ; // ROWCOL
-    uint8_t         _to   ; // ROWCOL
+    float           _eval      ;
+    uint16_t        _turn      ; // Even=White, Odd=Black
+    uint8_t         _flags     ;
+    uint8_t         _from      ; // ROWCOL
+    uint8_t         _to        ; // ROWCOL
+    uint8_t         _pawnsMoved; // Bitflags if pawn[col] has moved
 
     void Init()
     {
@@ -172,10 +175,14 @@ struct State_t
 
     bool IsCheck()
     {
-        uint8_t kingRankFile = 0; // FIXME: 
-        uint8_t origin       = BitBoardMakeLocation( kingRankFile );
-        uint8_t iPlayer      = _turn   & 1;
-        uint8_t iEnemy       = iPlayer ^ 1;
+        uint8_t iPlayer = _turn   & 1;
+        uint8_t iEnemy  = iPlayer ^ 1;
+
+        StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
+        StateBitBoard_t *pStateThem = &_player[ iEnemy  ];
+
+        bitboard_t origin           = pStateUs->_aBoards[ PIECE_KING ];
+        uint8_t    kingRankFile     = BitBoardToRankFile( origin );
 
         // From the King's location
         // see if any of the enemy pieces have Line-of-Sight to us
