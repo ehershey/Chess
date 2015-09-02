@@ -81,7 +81,7 @@ struct StateBitBoard_t
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
             bitboard_t bits = _aBoards[ iPiece ];
-            bitboard_t mask = 0x8000000000000000UL;
+            bitboard_t mask = 0x8000000000000000ull;
 
             // Enumerate though all bits, filling in the board
             char *p = board_->_cells;
@@ -114,16 +114,18 @@ enum StateFlags_e
 
 struct State_t
 {
-    StateBitBoard_t _player[ NUM_PLAYERS ];
-    float           _eval      ;
-    uint16_t        _turn      ; // Even=White, Odd=Black
-    uint8_t         _flags     ;
-    uint8_t         _from      ; // ROWCOL
-    uint8_t         _to        ; // ROWCOL
-    uint8_t         _pawnsMoved; // Bitflags if pawn[col] has moved
+    StateBitBoard_t _player[ NUM_PLAYERS ]; // 112 bytes
+    float           _eval      ; // +4 116
+    uint16_t        _turn      ; // +2 118  Even=White, Odd=Black
+    uint8_t         _flags     ; // +1 119
+    uint8_t         _from      ; // +1 120  ROWCOL
+    uint8_t         _to        ; // +1 121  ROWCOL
+    uint8_t         _pawnsMoved; // +1 122  Bitflags if pawn[col] has moved
 
     void Init()
     {
+printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
+printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         _flags = 0;
         _turn  = 1;
         _from  = 0;
@@ -132,7 +134,8 @@ struct State_t
         StateBitBoard_t *pState;
 
         pState = &_player[ PLAYER_WHITE ];
-        pState->_aBoards[ PIECE_EMPTY  ] = BitBoardMakeWhiteSquares();
+        // use board[ PIECE_EMPTY ] as Current Best Search ?
+        //pState->_aBoards[ PIECE_EMPTY  ] = 0; // BitBoardMakeWhiteSquares();
         pState->_aBoards[ PIECE_PAWN   ] = BitBoardInitWhitePawn  ();
         pState->_aBoards[ PIECE_ROOK   ] = BitBoardInitWhiteRook  ();
         pState->_aBoards[ PIECE_KNIGHT ] = BitBoardInitWhiteKnight();
@@ -141,7 +144,7 @@ struct State_t
         pState->_aBoards[ PIECE_KING   ] = BitBoardInitWhiteKing  ();
 
         pState = &_player[ PLAYER_BLACK ];
-        pState->_aBoards[ PIECE_EMPTY  ] = BitBoardMakeBlackSquares();
+        //pState->_aBoards[ PIECE_EMPTY  ] = 0; // BitBoardMakeBlackSquares();
         pState->_aBoards[ PIECE_PAWN   ] = BitBoardInitBlackPawn  ();
         pState->_aBoards[ PIECE_ROOK   ] = BitBoardInitBlackRook  ();
         pState->_aBoards[ PIECE_KNIGHT ] = BitBoardInitBlackKnight();
