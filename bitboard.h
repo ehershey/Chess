@@ -287,33 +287,33 @@ bitboard_t BitBoardMovesColorRook( uint8_t rankfile )
 
 bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
 {
-    /* 8 possible moves
+    /*
+        8 possible moves: I .. P
 
-      .C.B.
-      D. .A
-      . x .
-      E. .H
-      .F.G.
-
+            .K.J.
+            L. .I
+            . x .
+            M. .P
+            .N.O.
     */
     bitboard_t origin = BitBoardMakeLocation( rankfile );
 
-    // Clip Column Masks
-    bitboard_t fileA  = ~BitBoardMakeFile( 0 );
-    bitboard_t fileB  = ~BitBoardMakeFile( 1 );
-    bitboard_t fileG  = ~BitBoardMakeFile( 6 );
-    bitboard_t fileH  = ~BitBoardMakeFile( 7 );
+    // Column (file) Clip Masks
+    bitboard_t clipA  = ~BitBoardMakeFile( 0 );
+    bitboard_t clipB  = ~BitBoardMakeFile( 1 );
+    bitboard_t clipG  = ~BitBoardMakeFile( 6 );
+    bitboard_t clipH  = ~BitBoardMakeFile( 7 );
 
-    bitboard_t A = (origin <<  6) & fileA & fileB; // - 8+2
-    bitboard_t B = (origin << 15) & fileA        ; // -16+1
-    bitboard_t C = (origin << 17) &         fileH; // -16-1
-    bitboard_t D = (origin << 10) & fileG & fileH; // - 8-2
-    bitboard_t E = (origin >>  6) & fileG & fileH; // + 8-2
-    bitboard_t F = (origin >> 15) &         fileH; // +16-1
-    bitboard_t G = (origin >> 17) & fileA        ; // +16+1
-    bitboard_t H = (origin >> 10) & fileA & fileB; // + 8+2
+    bitboard_t I = (origin <<  6) & clipA & clipB; // - 8+2
+    bitboard_t J = (origin << 15) & clipA        ; // -16+1
+    bitboard_t K = (origin << 17) &         clipH; // -16-1
+    bitboard_t L = (origin << 10) & clipG & clipH; // - 8-2
+    bitboard_t M = (origin >>  6) & clipG & clipH; // + 8-2
+    bitboard_t N = (origin >> 15) &         clipH; // +16-1
+    bitboard_t O = (origin >> 17) & clipA        ; // +16+1
+    bitboard_t P = (origin >> 10) & clipA & clipB; // + 8+2
 
-    bitboard_t board = A | B | C | D | E | F | G | H;
+    bitboard_t board = I | J | K | L | M | N | O | P;
     return board;
 }
 
@@ -347,12 +347,19 @@ bitboard_t BitBoardMovesColorQueen( uint8_t rankfile )
 
 bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
 {
-    bitboard_t fileA  = ~BitBoardMakeFile( 0 );
-    bitboard_t fileH  = ~BitBoardMakeFile( 7 );
+    /*
+        8 possible moves: I .. P
+
+            LKJ
+            MxI
+            NOP
+    */
+    bitboard_t clipA  = ~BitBoardMakeFile( 0 );
+    bitboard_t clipH  = ~BitBoardMakeFile( 7 );
 
     bitboard_t origin = BitBoardMakeLocation( rankfile );
-    bitboard_t left   = (origin & fileA) << 1;
-    bitboard_t right  = (origin & fileH) >> 1;
+    bitboard_t left   = (origin & clipA) << 1;
+    bitboard_t right  = (origin & clipH) >> 1;
 
     bitboard_t above  = origin << 8;
     bitboard_t below  = origin >> 8;
