@@ -56,6 +56,18 @@
 
 typedef uint64_t bitboard_t;
 
+bitboard_t aCLIPFILE[8] =
+{
+     ~0x8080808080808080ull // Clip File A
+    ,~0x4040404040404040ull // Clip File B
+    ,~0x2020202020202020ull // Clip File C
+    ,~0x1010101010101010ull // Clip File D
+    ,~0x0808080808080808ull // Clip File E
+    ,~0x0404040404040404ull // Clip File F
+    ,~0x0202020202020202ull // Clip File G
+    ,~0x0101010101010101ull // Clip File H
+};
+
 bitboard_t BitBoardMakeWhiteSquares () { bitboard_t board = 0xAA55AA55AA55AA55ull; return board; }
 bitboard_t BitBoardMakeBlackSquares () { bitboard_t board = 0x55AA55AA55AA55AAull; return board; }
 bitboard_t BitBoardMakeBlackInit    () { bitboard_t board = 0xFFFF000000000000ull; return board; }
@@ -299,10 +311,10 @@ bitboard_t BitBoardMovesColorKnight( uint8_t rankfile )
     bitboard_t origin = BitBoardMakeLocation( rankfile );
 
     // Column (file) Clip Masks
-    bitboard_t clipA  = ~BitBoardMakeFile( 0 );
-    bitboard_t clipB  = ~BitBoardMakeFile( 1 );
-    bitboard_t clipG  = ~BitBoardMakeFile( 6 );
-    bitboard_t clipH  = ~BitBoardMakeFile( 7 );
+    bitboard_t clipA  = aCLIPFILE[0]; // ~BitBoardMakeFile( 0 );
+    bitboard_t clipB  = aCLIPFILE[1]; // ~BitBoardMakeFile( 1 );
+    bitboard_t clipG  = aCLIPFILE[6]; // ~BitBoardMakeFile( 6 );
+    bitboard_t clipH  = aCLIPFILE[7]; // ~BitBoardMakeFile( 7 );
 
     bitboard_t I = (origin <<  6) & clipA & clipB; // - 8+2
     bitboard_t J = (origin << 15) & clipA        ; // -16+1
@@ -354,8 +366,8 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
             MxI
             NOP
     */
-    bitboard_t clipA  = ~BitBoardMakeFile( 0 );
-    bitboard_t clipH  = ~BitBoardMakeFile( 7 );
+    bitboard_t clipA  = aCLIPFILE[0]; // ~BitBoardMakeFile( 0 );
+    bitboard_t clipH  = aCLIPFILE[7]; // ~BitBoardMakeFile( 7 );
 
     bitboard_t origin = BitBoardMakeLocation( rankfile );
     bitboard_t left   = (origin & clipA) << 1;

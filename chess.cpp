@@ -22,7 +22,7 @@ int main()
 //    }
 #endif
 
-#if 1
+#if 0
     bitboard_t board;
         uint8_t col, row, rankfile = 0x30; // A4
         RankFileToColRow( rankfile, col, row );
@@ -57,9 +57,9 @@ int main()
 #if 0
     for( int cell = 0; cell < 64; cell++ )
     {
-        //int col      = cell & 7;
-        //int row      = cell / 8;
-        //int rankfile = (row << 4) + col;
+        //uint8_t col      = cell & 7;
+        //uint8_t row      = cell / 8;
+        //uint8_t rankfile = (row << 4) + col;
 
         int col, row, rankfile;
         CellToColRow( cell, col, row );
@@ -74,7 +74,7 @@ int main()
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
@@ -90,7 +90,7 @@ int main()
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
@@ -106,7 +106,7 @@ int main()
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
@@ -117,7 +117,8 @@ int main()
         }
 #endif
 
-#if 0
+#if 1
+    bitboard_t board;
     printf( "= Knight Moves =\n" );
 
         //board = BitBoardMovesColorKnight( 0x33 ); // D4
@@ -129,7 +130,7 @@ int main()
 //if(1)
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
@@ -148,7 +149,7 @@ int main()
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
