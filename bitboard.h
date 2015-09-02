@@ -86,9 +86,6 @@ bitboard_t BitBoardInitWhiteQueen   () { bitboard_t board = 0x0000000000000010ul
 bitboard_t BitBoardInitBlackKing    () { bitboard_t board = 0x0800000000000000ull; return board; }
 bitboard_t BitBoardInitWhiteKing    () { bitboard_t board = 0x0000000000000008ull; return board; }
 
-const char aFILE[8] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' }; // which Col
-const char aRANK[8] = { '1', '2', '3', '4', '5', '6', '7', '8' }; // which Row
-
 /** @param col
 
     Col:  0    1    2    3    4    5    6    7

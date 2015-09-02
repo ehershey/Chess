@@ -50,6 +50,13 @@ void RankFileToColRow( const uint8_t rankfile, uint8_t& col_, uint8_t& row_ )
 }
 
 
+const char aFILE[8] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' }; // which Col
+const char aRANK[8] = { '1', '2', '3', '4', '5', '6', '7', '8' }; // which Row
+
+
+char RankFileToFile( const uint8_t rankfile ) { return aFILE[ rankfile & 7 ]; }
+char RankFileToRank( const uint8_t rankfile ) { return aRANK[ rankfile / 8 ]; }
+
 
     const uint8_t aBitCount8[ 256 ] =
     {
