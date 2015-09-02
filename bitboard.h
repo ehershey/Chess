@@ -56,23 +56,23 @@
 
 typedef uint64_t bitboard_t;
 
-bitboard_t BitBoardMakeWhiteSquares () { bitboard_t board = 0xAA55AA55AA55AA55UL; return board; }
-bitboard_t BitBoardMakeBlackSquares () { bitboard_t board = 0x55AA55AA55AA55AAUL; return board; }
-bitboard_t BitBoardMakeBlackInit    () { bitboard_t board = 0xFFFF000000000000UL; return board; }
-bitboard_t BitBoardMakeWhiteInit    () { bitboard_t board = 0x000000000000FFFFUL; return board; }
+bitboard_t BitBoardMakeWhiteSquares () { bitboard_t board = 0xAA55AA55AA55AA55ull; return board; }
+bitboard_t BitBoardMakeBlackSquares () { bitboard_t board = 0x55AA55AA55AA55AAull; return board; }
+bitboard_t BitBoardMakeBlackInit    () { bitboard_t board = 0xFFFF000000000000ull; return board; }
+bitboard_t BitBoardMakeWhiteInit    () { bitboard_t board = 0x000000000000FFFFull; return board; }
 
-bitboard_t BitBoardInitBlackPawn    () { bitboard_t board = 0x00FF000000000000UL; return board; }
-bitboard_t BitBoardInitWhitePawn    () { bitboard_t board = 0x000000000000FF00UL; return board; }
-bitboard_t BitBoardInitBlackRook    () { bitboard_t board = 0x8100000000000000UL; return board; }
-bitboard_t BitBoardInitWhiteRook    () { bitboard_t board = 0x0000000000000081UL; return board; }
-bitboard_t BitBoardInitBlackKnight  () { bitboard_t board = 0x4200000000000000UL; return board; }
-bitboard_t BitBoardInitWhiteKnight  () { bitboard_t board = 0x0000000000000042UL; return board; }
-bitboard_t BitBoardInitBlackBishop  () { bitboard_t board = 0x2400000000000000UL; return board; }
-bitboard_t BitBoardInitWhiteBishop  () { bitboard_t board = 0x0000000000000024UL; return board; }
-bitboard_t BitBoardInitBlackQueen   () { bitboard_t board = 0x1000000000000000UL; return board; }
-bitboard_t BitBoardInitWhiteQueen   () { bitboard_t board = 0x0000000000000010UL; return board; }
-bitboard_t BitBoardInitBlackKing    () { bitboard_t board = 0x0800000000000000UL; return board; }
-bitboard_t BitBoardInitWhiteKing    () { bitboard_t board = 0x0000000000000008UL; return board; }
+bitboard_t BitBoardInitBlackPawn    () { bitboard_t board = 0x00FF000000000000ull; return board; }
+bitboard_t BitBoardInitWhitePawn    () { bitboard_t board = 0x000000000000FF00ull; return board; }
+bitboard_t BitBoardInitBlackRook    () { bitboard_t board = 0x8100000000000000ull; return board; }
+bitboard_t BitBoardInitWhiteRook    () { bitboard_t board = 0x0000000000000081ull; return board; }
+bitboard_t BitBoardInitBlackKnight  () { bitboard_t board = 0x4200000000000000ull; return board; }
+bitboard_t BitBoardInitWhiteKnight  () { bitboard_t board = 0x0000000000000042ull; return board; }
+bitboard_t BitBoardInitBlackBishop  () { bitboard_t board = 0x2400000000000000ull; return board; }
+bitboard_t BitBoardInitWhiteBishop  () { bitboard_t board = 0x0000000000000024ull; return board; }
+bitboard_t BitBoardInitBlackQueen   () { bitboard_t board = 0x1000000000000000ull; return board; }
+bitboard_t BitBoardInitWhiteQueen   () { bitboard_t board = 0x0000000000000010ull; return board; }
+bitboard_t BitBoardInitBlackKing    () { bitboard_t board = 0x0800000000000000ull; return board; }
+bitboard_t BitBoardInitWhiteKing    () { bitboard_t board = 0x0000000000000008ull; return board; }
 
 const char aFILE[8] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' }; // which Col
 const char aRANK[8] = { '1', '2', '3', '4', '5', '6', '7', '8' }; // which Row
@@ -164,7 +164,7 @@ bitboard_t BitBoardMakeDiagonalLeft( uint8_t rankfile )
     uint8_t row  = (rankfile >> 4) & 7; // rank
     uint8_t col  = (rankfile >> 0) & 7; // file
     uint8_t diag = row + col;
-    bitboard_t board = 0x8040201008040201UL;
+    bitboard_t board = 0x8040201008040201ull;
 
     // col + row = Left Diagonal = Total 14 diagonals
     // 789ABCDE
@@ -179,21 +179,21 @@ bitboard_t BitBoardMakeDiagonalLeft( uint8_t rankfile )
     // ABCDEFGH File
     switch( diag )
     {
-        case 0x0: board = 0x0000000000000080UL; break; // >> 7*8 // same as Right, but bytes mirrored
-        case 0x1: board = 0x0000000000008040UL; break; // >> 6*8
-        case 0x2: board = 0x0000000000804020UL; break; // >> 5*8
-        case 0x3: board = 0x0000000080402010UL; break; // >> 4*8
-        case 0x4: board = 0x0000008040201008UL; break; // >> 3*8
-        case 0x5: board = 0x0000804020100804UL; break; // >> 2*8
-        case 0x6: board = 0x0080402010080402UL; break; // >> 1*8
-        case 0x7: board = 0x8040201008040201UL; break; // Above is >> 8*, Below is << 8*
-        case 0x8: board = 0x4020100804020100UL; break; // << 1*8
-        case 0x9: board = 0x2010080402010000UL; break; // << 2*8
-        case 0xA: board = 0x1008040201000000UL; break; // << 3*8
-        case 0xB: board = 0x0804020100000000UL; break; // << 4*8
-        case 0xC: board = 0x0402010000000000UL; break; // << 5*8
-        case 0xD: board = 0x0201000000000000UL; break; // << 6*8
-        case 0xE: board = 0x0100000000000000UL; break; // << 7*8
+        case 0x0: board = 0x0000000000000080ull; break; // >> 7*8 // same as Right, but bytes mirrored
+        case 0x1: board = 0x0000000000008040ull; break; // >> 6*8
+        case 0x2: board = 0x0000000000804020ull; break; // >> 5*8
+        case 0x3: board = 0x0000000080402010ull; break; // >> 4*8
+        case 0x4: board = 0x0000008040201008ull; break; // >> 3*8
+        case 0x5: board = 0x0000804020100804ull; break; // >> 2*8
+        case 0x6: board = 0x0080402010080402ull; break; // >> 1*8
+        case 0x7: board = 0x8040201008040201ull; break; // Above is >> 8*, Below is << 8*
+        case 0x8: board = 0x4020100804020100ull; break; // << 1*8
+        case 0x9: board = 0x2010080402010000ull; break; // << 2*8
+        case 0xA: board = 0x1008040201000000ull; break; // << 3*8
+        case 0xB: board = 0x0804020100000000ull; break; // << 4*8
+        case 0xC: board = 0x0402010000000000ull; break; // << 5*8
+        case 0xD: board = 0x0201000000000000ull; break; // << 6*8
+        case 0xE: board = 0x0100000000000000ull; break; // << 7*8
     }
     return board;
 }
@@ -207,7 +207,7 @@ bitboard_t BitBoardMakeDiagonalRight( uint8_t rankfile )
     uint8_t row  = (rankfile >> 4) & 7; // rank
     uint8_t col  = (rankfile >> 0) & 7; // file
     uint8_t diag = (7 - row) + col;
-    bitboard_t board = 0x0102040810204080UL;
+    bitboard_t board = 0x0102040810204080ull;
 
     // Total of 14 diagonals
     // 01234567   7 -> 0
@@ -222,21 +222,21 @@ bitboard_t BitBoardMakeDiagonalRight( uint8_t rankfile )
     // ABCDEFGH File
     switch( diag )
     {
-        case 0x0: board = 0x8000000000000000UL; break; // << 7*8
-        case 0x1: board = 0x4080000000000000UL; break; // << 6*8
-        case 0x2: board = 0x2040800000000000UL; break; // << 5*8
-        case 0x3: board = 0x1020408000000000UL; break; // << 4*8
-        case 0x4: board = 0x0810204080000000UL; break; // << 3*8
-        case 0x5: board = 0x0408102040800000UL; break; // << 2*8
-        case 0x6: board = 0x0204081020408000UL; break; // << 1*8
-        case 0x7: board = 0x0102040810204080UL; break; // Above is << *8, Below is >> *8
-        case 0x8: board = 0x0001020408102040UL; break; // >> 1*8
-        case 0x9: board = 0x0000010204081020UL; break; // >> 2*8
-        case 0xA: board = 0x0000000102040810UL; break; // >> 3*8
-        case 0xB: board = 0x0000000001020408UL; break; // >> 4*8
-        case 0xC: board = 0x0000000000010204UL; break; // >> 5*8
-        case 0xD: board = 0x0000000000000102UL; break; // >> 6*8
-        case 0xE: board = 0x0000000000000001UL; break; // >> 7*8
+        case 0x0: board = 0x8000000000000000ull; break; // << 7*8
+        case 0x1: board = 0x4080000000000000ull; break; // << 6*8
+        case 0x2: board = 0x2040800000000000ull; break; // << 5*8
+        case 0x3: board = 0x1020408000000000ull; break; // << 4*8
+        case 0x4: board = 0x0810204080000000ull; break; // << 3*8
+        case 0x5: board = 0x0408102040800000ull; break; // << 2*8
+        case 0x6: board = 0x0204081020408000ull; break; // << 1*8
+        case 0x7: board = 0x0102040810204080ull; break; // Above is << *8, Below is >> *8
+        case 0x8: board = 0x0001020408102040ull; break; // >> 1*8
+        case 0x9: board = 0x0000010204081020ull; break; // >> 2*8
+        case 0xA: board = 0x0000000102040810ull; break; // >> 3*8
+        case 0xB: board = 0x0000000001020408ull; break; // >> 4*8
+        case 0xC: board = 0x0000000000010204ull; break; // >> 5*8
+        case 0xD: board = 0x0000000000000102ull; break; // >> 6*8
+        case 0xE: board = 0x0000000000000001ull; break; // >> 7*8
     }
 
     return board;
