@@ -2,15 +2,39 @@
 #include <stdint.h> // uint64_t
 #include <string.h> // memcpy
 
+#include "utility.h"
 #include "bitboard.h"
 #include "pieces.h"
 #include "state.h"
 
+
 int main()
 {
-    bitboard_t board;
 
 #if 0
+    make_bitcount8();
+
+//    for( int i = 0; i < 256; i++ )
+//    {
+//        int a = bitcount8( i );
+//        int b = popcount64( i );
+//            printf( "[%02X]: %d != %d\n", i, a, b );
+//    }
+#endif
+
+#if 1
+    bitboard_t board;
+        uint8_t col, row, rankfile = 0x30; // A4
+        RankFileToColRow( rankfile, col, row );
+        printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+    board = BitBoardMovesColorKnight( rankfile ); 
+    BitBoardPrint( board );
+    int moves = bitcount( board );
+    printf( "%d max potential moves\n", moves );
+#endif
+
+#if 0
+    bitboard_t board;
     board = BitBoardMakeWhiteSquares();
     printf( "White Squares\n" );
     BitBoardPrint( board );
@@ -182,7 +206,6 @@ int main()
             printf( "\n" );
         }
 #endif
-
 
     return 0;
 }

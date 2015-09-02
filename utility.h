@@ -1,28 +1,53 @@
 // i -> x,y
-void CellToColRow( const int cell, int& col_, int& row_ )
+void CellToColRow( const uint8_t cell, uint8_t& col_, uint8_t& row_ )
 {
     col_ = cell & 7;
     row_ = cell / 8; // >> 3
 }
 
 
-void RankFileToCell( const int rankfile, int& cell_ )
+// i -> rf 
+uint8_t CellToRankFile( const int cell )
 {
-
+    uint8_t col      = cell & 7;
+    uint8_t row      = cell / 8; // >> 3
+    uint8_t rankfile = (row << 4) + col;
+    return  rankfile ;
 }
 
-void RankFileToColRow( const int rankfile, int& col_, int& row_ )
+
+// x,y -> i
+uint8_t ColRowToCell( const uint8_t col, const uint8_t row )
+{
+    uint8_t cell = (row << 3) + col;
+    return  cell ;
+}
+
+
+// x,y -> rf
+uint8_t ColRowToRankFile( const uint8_t col, const uint8_t row )
+{
+    uint8_t rankfile = (row << 4) + col;
+    return  rankfile ;
+}
+
+
+// rf -> i
+uint8_t RankFileToCell( const uint8_t rankfile )
+{
+    uint8_t col  = rankfile &  7;
+    uint8_t row  = rankfile >> 4;
+    uint8_t cell = (row << 3) + col;
+    return  cell ;
+}
+
+
+// rf -> x,y
+void RankFileToColRow( const uint8_t rankfile, uint8_t& col_, uint8_t& row_ )
 {
     col_ = rankfile &  7;
     row_ = rankfile >> 4;
 }
-
-uint8_t ColRowToRankFile( const int col, const int row )
-{
-    uint8_t rankfile = (row << 4) + col;
-    return rankfile;
-}
-
 
 
 
