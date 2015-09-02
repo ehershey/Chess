@@ -108,14 +108,14 @@ const char aRANK[8] = { '1', '2', '3', '4', '5', '6', '7', '8' }; // which Row
 
 // Map File to BitMask: // 1 << (8 - col)
 const uint8_t aColMask[8] = {
-     0x80 // 1
-    ,0x40 // 2
-    ,0x20 // 3
-    ,0x10 // 4
-    ,0x08 // 5
-    ,0x04 // 6
-    ,0x02 // 7
-    ,0x01 // 8
+     0x80 // 1 -> RF 0x00 = File A
+    ,0x40 // 2 -> RF 0x01 = File B
+    ,0x20 // 3 -> RF 0x02 = File C
+    ,0x10 // 4 -> RF 0x03 = File D
+    ,0x08 // 5 -> RF 0x04 = File E
+    ,0x04 // 6 -> RF 0x05 = File F
+    ,0x02 // 7 -> RF 0x06 = File G
+    ,0x01 // 8 -> RF 0x07 = File H
 };
 
 
@@ -424,6 +424,26 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
         | bl | below | br;
 
     return board & ~origin;
+}
+
+
+/** Max 27 moves for queen
+*/
+void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8_t aMoves_[] )
+{
+    uint8_t iMove   = 0;
+    bitboard_t temp = board;
+
+    for( int y = 0; y < 8; y++ )
+        for( int x = 7; x >= 0; x--, temp >>= 1 )
+            if( temp & 1 )
+            {
+                aMoves_[ iMove ] = (y*8) + (7-x); // y,x -> RankFile;
+                iMove++;
+            }
+
+    nMoves_ = bitcount( board );
+    // Assert( iMove == nMoves_ );
 }
 
 
