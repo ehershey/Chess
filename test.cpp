@@ -6,7 +6,7 @@
 #include "bitboard.h"
 #include "pieces.h"
 #include "state.h"
-
+#include "game.h"
 
 int main()
 {
@@ -70,6 +70,7 @@ int main()
 #endif
 
 #if 0
+    bitboard_t board;
     printf( "= White Pawn Moves =\n" );
 
         for( int cell = 0; cell < 64; cell++ )
@@ -86,7 +87,9 @@ int main()
 #endif
 
 #if 0
-    printf( "= Black Pawn Moves =\n" );
+    {
+        bitboard_t board;
+        printf( "= Black Pawn Moves =\n" );
 
         for( int cell = 0; cell < 64; cell++ )
         {
@@ -99,10 +102,13 @@ int main()
             BitBoardPrint( board );
             printf( "\n" );
         }
+
+    }
 #endif
 
 #if 0
-    printf( "= Rook Moves =\n" );
+        bitboard_t board;
+        printf( "= Rook Moves =\n" );
 
         for( int cell = 0; cell < 64; cell++ )
         {
@@ -142,6 +148,7 @@ int main()
 #endif
 
 #if 0
+    bitboard_t board;
     printf( "= Bishop Moves =\n" );
 
         BitBoardPrint( board );
@@ -161,6 +168,7 @@ int main()
 #endif
 
 #if 0
+    bitboard_t board;
     printf( "= Queen Moves =\n" );
 
         board = BitBoardMovesColorQueen( 0x00 );
@@ -181,31 +189,38 @@ int main()
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
             board = BitBoardMovesColorQueen( rankfile );
+
             BitBoardPrint( board );
             printf( "\n" );
         }
 #endif
 
 #if 0
-    printf( "= King Moves =\n" );
+    {
+        bitboard_t board;
+        printf( "= King Moves =\n" );
 
         for( int cell = 0; cell < 64; cell++ )
         {
-            int col, row, rankfile;
+            uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
 
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
             board = BitBoardMovesColorKing( rankfile );
+            uint8_t kingRF = BitBoardToRankFile( board );
+            printf( "rank_file: %02X %s %02X kingRF\n", rankfile, (rankfile == kingRF) ? "==" : "!=", kingRF );
+
             BitBoardPrint( board );
             printf( "\n" );
         }
+    }
 #endif
 
     return 0;
