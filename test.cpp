@@ -201,6 +201,45 @@ int main()
         }
 #endif
 
+#if 1
+        printf( "= Queen - # Moves for all positions =\n" );
+        int maxmoves = 0;
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+
+            bitboard_t board = BitBoardMovesColorQueen( rankfile );
+            uint8_t moves = bitcount( board );
+            printf( "%02X: %d\n", cell, moves );
+
+            if( maxmoves < moves )
+                maxmoves = moves ;
+        }
+        printf( "Max Moves: %d\n", maxmoves );
+
+#endif
+
+#if 1
+        printf( "= Queen - Print each potential move =\n" );
+
+        uint8_t nRankFile = 0x24;
+        bitboard_t board = BitBoardMovesColorQueen( nRankFile );
+
+        uint8_t nMoves;
+        uint8_t aMoves[ 32 ];
+        BitBoardToRankFileAllMoves( board, nMoves, aMoves );
+        printf( "Moves: %d\n", nMoves );
+        for( int iMove = 0; iMove < nMoves; iMove++ )
+        {
+            printf( "[%2d]: 0x%02X\n", iMove, aMoves[ iMove ] );
+        }
+#endif
+
+
+
 #if 0
     {
         bitboard_t board;
