@@ -435,12 +435,12 @@ void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8
         for( int x = 7; x >= 0; x--, temp >>= 1 )
             if( temp & 1 )
             {
-                aMoves_[ iMove ] = (y*8) + (7-x); // y,x -> RankFile;
+                aMoves_[ iMove ] = (y*8) + x; // y,x -> RankFile;
                 iMove++;
             }
 
     nMoves_ = bitcount( board );
-    // Assert( iMove == nMoves_ );
+    // AssertT( iMove == nMoves_ );
 }
 
 
