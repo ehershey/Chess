@@ -114,7 +114,7 @@ enum StateFlags_e
 
 struct State_t
 {
-    StateBitBoard_t _player[ NUM_PLAYERS ]; // 112 bytes
+    StateBitBoard_t _player[ NUM_PLAYERS ]; // 112 bytes (or 96 bytes if no empty states)
     float           _eval      ; // +4 116
     uint16_t        _turn      ; // +2 118  Even=White, Odd=Black
     uint8_t         _flags     ; // +1 119
