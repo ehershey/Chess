@@ -79,7 +79,7 @@ int main( const int nArg, const char *aArg[] )
 #endif
 
     // spin-lock
-    // wait for command    
+    // wait for command
 
     return 0;
 }
