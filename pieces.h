@@ -1,16 +1,16 @@
 enum Pieces_e
 {
-    PIECE_EMPTY , // 0
-    PIECE_PAWN  , // 1
-    PIECE_ROOK  , // 2
-    PIECE_KNIGHT, // 3
-    PIECE_BISHOP, // 4
-    PIECE_QUEEN , // 5
-    PIECE_KING  , // 6
-    NUM_PIECES
+    PIECE_PAWN  , // 0
+    PIECE_ROOK  , // 1
+    PIECE_KNIGHT, // 2
+    PIECE_BISHOP, // 3
+    PIECE_QUEEN , // 4
+    PIECE_KING  , // 5
+    NUM_PIECES  ,
+    PIECE_EMPTY , // 7
 };
 
-const char aPIECES[] = " PRNBQK? prnbqk?"; // Uppercase = White, Lowercase = Black
+const char aPIECES[] = "PRNBQK? prnbqk? "; // Uppercase = White, Lowercase = Black
 
 enum Player_e
 {
