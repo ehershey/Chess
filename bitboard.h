@@ -46,6 +46,7 @@
   Useful links:
 
     * http://aghaznawi.comuf.com/computer%20chess/winglet/07boardrep01.htm
+    * http://aghaznawi.comuf.com/computer%20chess/winglet/source/index.htm
 
     * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/rep.html
     * http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/physical.html
