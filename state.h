@@ -227,7 +227,7 @@ inline uint8_t GetColorEnemy () { return ~_nTurn & 1; }
         uint8_t    kingRankFile     = BitBoardToRankFile( origin );
 
         // From the King's location
-        // see if any of the enemy pieces have Line-of-Sight to us
+        // see if any of the enemy's pieces have Line-of-Sight to us
 
         for( int iPiece = PIECE_QUEEN; iPiece > PIECE_PAWN; iPiece-- )
         {
@@ -235,7 +235,6 @@ inline uint8_t GetColorEnemy () { return ~_nTurn & 1; }
             bitboard_t movesPotential = 0;
             bitboard_t movesValid     = 0;
 
-(void) movesAll;
 (void) movesPotential;
 (void) movesValid;
 
