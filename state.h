@@ -107,29 +107,46 @@ struct StateBitBoard_t
 enum StateFlags_e
 {
      STATE_CHECK             = (1 << 0)
-    ,STATE_CAN_CASTLE_K_SIDE = (1 << 1)
-    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 2)
+    ,STATE_CHECKMATE         = (1 << 1)
+    ,STATE_STALEMATE         = (1 << 2)
+    ,STATE_CAN_CASTLE_K_SIDE = (1 << 3)
+    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4)
   //,STATE_HAS_CASTLED       = (1 << 3) // CanCastle( _flags & (STATE_CAN_CASTLE_K_SIDE|STATE_CAN_CASTLE_Q_SIDE) )
+    ,STATE_GAME_MID          = (1 << 5) // 1=mid game, 0=early or end-game
 };
 
 struct State_t
 {
-    StateBitBoard_t _player[ NUM_PLAYERS ]; // 112 bytes (or 96 bytes if no empty states)
-    float           _eval      ; // +4 116
-    uint16_t        _turn      ; // +2 118  Even=White, Odd=Black
-    uint8_t         _flags     ; // +1 119
-    uint8_t         _from      ; // +1 120  ROWCOL
-    uint8_t         _to        ; // +1 121  ROWCOL
-    uint8_t         _pawnsMoved; // +1 122  Bitflags if pawn[col] has moved
+    StateBitBoard_t _player[ NUM_PLAYERS ]; // 96 bytes if not storing board[ PIECE_EMPTY ]
+    //                            //      96  112 bytes
+    float           _nEval      ; // +4  100  116
+    uint16_t        _nTurn      ; // +2  102  118  Even=White, Odd=Black
+    uint16_t        _iParent    ; // +2  104  120  i-node of parent
+    uint16_t        _iFirstChild; // +2  106  122  i-node of first child
+    uint8_t         _bFlags     ; // +1  107  123
+    uint8_t         _iFrom      ; // +1  108  124  RankFile (0xROWCOL)
+    uint8_t         _iTo        ; // +1  109  125  RankFile (0xROWCOL)
+    uint8_t         _ePiece     ; // +1  110  126  which piece was moved
+    uint8_t         _bPawnsMoved; // +1  111  127  Bitflags if pawn[col] has moved
+    uint8_t         _nChildren  ; // +1  112  128  total children
+//  uint8_t         _iGamePhase ; // +1  113  129  0=early game, 0x10=mid-game, 0x20=end-game
 
     void Init()
     {
 printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
 printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
-        _flags = 0;
-        _turn  = 1;
-        _from  = 0;
-        _to    = 0;
+
+        _nEval  = 0.f;
+        _bFlags = 0;
+        _nTurn  = 0;
+        _iFrom  = 0;
+        _iTo    = 0;
+
+        _ePiece      = PIECE_EMPTY; // also encodes color to play next
+        _bPawnsMoved = 0;
+        _iParent     = 0;
+        _iFirstChild = 1;
+        _nChildren   = 0;
 
         StateBitBoard_t *pState;
 
@@ -178,7 +195,7 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
 
     bool IsCheck()
     {
-        uint8_t iPlayer = _turn   & 1;
+        uint8_t iPlayer = _nTurn  & 1;
         uint8_t iEnemy  = iPlayer ^ 1;
 
         StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
@@ -242,9 +259,9 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
 
     float Eval()
     {
-        _eval = 0.f;
+        _nEval = 0.f;
 
-        return _eval;
+        return _nEval;
     }
 };
 

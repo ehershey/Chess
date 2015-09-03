@@ -231,11 +231,20 @@ int main()
         uint8_t nMoves;
         uint8_t aMoves[ 32 ];
         BitBoardToRankFileAllMoves( board, nMoves, aMoves );
-        printf( "Moves: %d\n", nMoves );
+
+        BitBoardPrint( board );
+
+        printf( "  Moves: %d\n", nMoves );
         for( int iMove = 0; iMove < nMoves; iMove++ )
         {
-            printf( "[%2d]: 0x%02X\n", iMove, aMoves[ iMove ] );
+            uint8_t nRF  = aMoves[ iMove ];
+            uint8_t nRow; // Rank
+            uint8_t nCol; // File
+            RankFileToColRow( nRF, nCol, nRow );
+
+            printf( "  [%2d]: 0x%02X %c%c\n", iMove, aMoves[ iMove ], RankFileToFile( nRF ), RankFileToRank( nRF ) );
         }
+
 #endif
 
 
