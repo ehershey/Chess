@@ -430,10 +430,10 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
 
 /**
   1 Queeen : Max 27 moves
-  2 Bishops: ?
+  2 Bishops: 26
   8 Queens : 64+
 */
-void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8_t aMoves_[] )
+void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8_t aMoves_[], uint8_t nMaxMoves = 0 )
 {
     uint8_t iMove   = 0;
     bitboard_t temp = board;
@@ -442,7 +442,8 @@ void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8
         for( int x = 7; x >= 0; x--, temp >>= 1 )
             if( temp & 1 )
             {
-                aMoves_[ iMove ] = (y*8) + x; // y,x -> RankFile;
+                if (nMaxMoves && (iMove < nMaxMoves))
+                    aMoves_[ iMove ] = (y*8) + x; // y,x -> RankFile;
                 iMove++;
             }
 
