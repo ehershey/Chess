@@ -30,7 +30,12 @@ void InitMulticore()
 
     for( int iCore = 0; iCore < gnThreadsActive; iCore++ )
     {
+        nMovePool[ iCore ] = 0;
+        aMovePool[ iCore ] = new State_t[ MAX_POOL_MOVES ];
     }
+
+    size_t nMemState = sizeof( State_t[ MAX_POOL_MOVES ] );
+    printf( "Mem/Core: %u bytes (%u KB)\n", (uint32_t) nMemState, (uint32_t) nMemState/1024 );
 }
 // END OMP
 
@@ -41,6 +46,14 @@ int main( const int nArg, const char *aArg[] )
 
     InitMulticore();
 
+    State_t state;
+    state.Init();
+
+#if 0
+    //state.Dump();
+    state.PrettyPrintBoard();
+#endif
+
 #if 1
         printf( "= Queen - Print each potential move =\n" );
 
@@ -50,10 +63,18 @@ int main( const int nArg, const char *aArg[] )
         uint8_t nMoves;
         uint8_t aMoves[ 32 ];
         BitBoardToRankFileAllMoves( board, nMoves, aMoves );
-        printf( "Moves: %d\n", nMoves );
+
+        BitBoardPrint( board );
+
+        printf( "  Moves: %d\n", nMoves );
         for( int iMove = 0; iMove < nMoves; iMove++ )
         {
-            printf( "[%2d]: 0x%02X\n", iMove, aMoves[ iMove ] );
+            uint8_t nRF  = aMoves[ iMove ];
+            uint8_t nRow; // Rank
+            uint8_t nCol; // File
+            RankFileToColRow( nRF, nCol, nRow );
+
+            printf( "  [%2d]: 0x%02X %c%c\n", iMove, aMoves[ iMove ], RankFileToFile( nRF ), RankFileToRank( nRF ) );
         }
 #endif
 
