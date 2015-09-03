@@ -136,7 +136,8 @@ struct State_t
     uint16_t        _nTurn      ; // +2  100  116  Even=White, Odd=Black
     uint16_t        _iParent    ; // +2  102  118  i-node of parent
     uint16_t        _iFirstChild; // +2  104  120  i-node of first child
-    uint16_t        _bFlags     ; // +2  106  122
+    uint16_t        _bFlags     ; // +1  105  122
+    uint8_t         _bMoveType  ; // +1  106       // http://chessprogramming.wikispaces.com/Encoding+Moves
     uint8_t         _iFrom      ; // +1  107  123  RankFile (0xROWCOL)
     uint8_t         _iTo        ; // +1  108  124  RankFile (0xROWCOL)
     uint8_t         _ePiece     ; // +1  109  125  which piece was moved
