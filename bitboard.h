@@ -9,18 +9,21 @@
     WBWBWBWB
     BWBWBWBW
 
-3 Choices for Bitboards: (We use the first one)
+3 Choices for Bitboards: (We use the first one):
 
-  63 62 61 60 59 58 57 56   a8 b8 c8 d8 e8 f8 g8 h8
-  55 54 53 52 51 50 49 48   a7 b7 c7 d7 e7 f7 g7 h7
-  47 46 45 44 43 42 41 40   a6 b6 c6 d6 e6 f6 g6 h6
-  39 38 37 36 35 34 33 32   a5 b5 c5 d5 e5 f5 g5 h5
-  31 30 29 28 27 26 25 24   a4 b4 c4 d4 e4 f4 g4 h4
-  23 22 21 20 19 18 17 16   a3 b3 c3 d3 e3 f3 g3 h3
-  15 14 13 12 11 10  9  8   a2 b2 c2 d2 e2 f2 g2 h2
-   7  6  5  4  3  2  1  0   a1 b1 c1 d1 e1 f1 g1 h1  Rank 1 .. 8
+  File: A..H (Col)
+  Rank: 1..8 (Row)
 
-                            File A..H
+  = iCell =                 = Chess =                 = 0xRankFile =
+  63 62 61 60 59 58 57 56   a8 b8 c8 d8 e8 f8 g8 h8   70 71 72 73 74 75 76 77
+  55 54 53 52 51 50 49 48   a7 b7 c7 d7 e7 f7 g7 h7   60 61 62 63 64 65 66 67
+  47 46 45 44 43 42 41 40   a6 b6 c6 d6 e6 f6 g6 h6   50 51 52 53 54 55 56 57
+  39 38 37 36 35 34 33 32   a5 b5 c5 d5 e5 f5 g5 h5   40 41 42 43 44 45 46 47
+  31 30 29 28 27 26 25 24   a4 b4 c4 d4 e4 f4 g4 h4   30 31 32 33 34 35 36 37
+  23 22 21 20 19 18 17 16   a3 b3 c3 d3 e3 f3 g3 h3   20 21 22 23 24 25 26 27
+  15 14 13 12 11 10  9  8   a2 b2 c2 d2 e2 f2 g2 h2   10 11 12 13 14 15 16 17
+   7  6  5  4  3  2  1  0   a1 b1 c1 d1 e1 f1 g1 h1   00 01 02 03 04 05 06 07
+
 
   56 57 58 59 60 61 62 63   a8 b8 c8 d8 e8 f8 g8 h8
   48 49 50 51 52 53 54 55   a7 b7 c7 d7 e7 f7 g7 h7
@@ -29,9 +32,8 @@
   24 25 26 27 28 29 30 31   a4 b4 c4 d4 e4 f4 g4 h4
   16 17 18 19 20 21 22 23   a3 b3 c3 d3 e3 f3 g3 h3
    8  9 10 11 12 13 14 15   a2 b2 c2 d2 e2 f2 g2 h2
-   0  1  2  3  4  5  6  7   a1 b1 c1 d1 e1 f1 g1 h1  Rank 1 .. 8
+   0  1  2  3  4  5  6  7   a1 b1 c1 d1 e1 f1 g1 h1
 
-                            File A..H
 
    0  1  2  3  4  5  6  7   a8 b8 c8 d8 e8 f8 g8 h8
    8  9 10 11 12 13 14 15   a7 b7 c7 d7 e7 f7 g7 h7
@@ -40,9 +42,8 @@
   32 33 34 35 36 37 38 39   a4 b4 c4 d4 e4 f4 g4 h4
   40 41 42 43 44 45 46 47   a3 b3 c3 d3 e3 f3 g3 h3
   48 49 50 51 52 53 54 55   a2 b2 c2 d2 e2 f2 g2 h2
-  56 57 58 59 60 61 62 63   a1 b1 c1 d1 e1 f1 g1 h1  Rank 1 .. 8
+  56 57 58 59 60 61 62 63   a1 b1 c1 d1 e1 f1 g1 h1
 
-                            File A..H
   Useful links:
 
     * http://aghaznawi.comuf.com/computer%20chess/winglet/07boardrep01.htm
@@ -427,7 +428,10 @@ bitboard_t BitBoardMovesColorKing( uint8_t rankfile )
 }
 
 
-/** Max 27 moves for queen
+/**
+  1 Queeen : Max 27 moves
+  2 Bishops: ?
+  8 Queens : 64+
 */
 void BitBoardToRankFileAllMoves( const bitboard_t board, uint8_t& nMoves_, uint8_t aMoves_[] )
 {
