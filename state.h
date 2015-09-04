@@ -293,6 +293,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     {
         uint8_t iPlayer    = GetColorPlayer();
         uint8_t iPieceSrc  = _player[ iPlayer ].GetPiece( fromRankFile );
+        uint8_t iPieceDst  = _player[ iPlayer ].GetPiece( toRankFile   );
 
 (void) iPlayer;
 
@@ -324,7 +325,6 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         else
         if( iPieceSrc == PIECE_KING )
         {
-
             if( bCanCastle )
             {
                 bool bJustCastled = false;
@@ -334,18 +334,14 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x02 C1 -- IsCheck()?
                         // Place King 0x03 D1 -- IsCheck()?
-                        _bFlags     &= ~bCanCastle         ;
-                        _bMoveType  |=  MOVE_CASTLED_Q_SIDE;
-                        bJustCastled = true;
+                        bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
                     }
 
                     if( bCanCastleK && (fromRankFile == 0x05) && (toRankFile == 0x07) )
                     {
                         // Place King 0x05 F1 -- IsCheck()?
                         // Place King 0x06 G1 -- IsCheck()?
-                        _bFlags     &= ~bCanCastle         ;
-                        _bMoveType  |=  MOVE_CASTLED_K_SIDE;
-                        bJustCastled = true;
+                        bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
                     }
                 }
 
@@ -355,18 +351,14 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x72 C8 -- IsCheck()?
                         // Place King 0x73 D8 -- IsCheck()?
-                        _bFlags     &= ~bCanCastle         ;
-                        _bMoveType  |=  MOVE_CASTLED_Q_SIDE;
-                        bJustCastled = true;
+                        bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
                     }
 
                     if( bCanCastleK && (fromRankFile == 0x75) && (toRankFile == 0x77) )
                     {
                         // Place King 0x75 F8 -- IsCheck()?
                         // Place King 0x76 G8 -- IsCheck()?
-                        _bFlags     &= ~bCanCastle         ;
-                        _bFlags     |=  MOVE_CASTLED_K_SIDE;
-                        bJustCastled = true;
+                        bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
                     }
                 }
 
@@ -398,6 +390,9 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     // Place new king, new rook
                     _player[ iPlayer ]._aBoards[ PIECE_KING ] |= newKing;
                     _player[ iPlayer ]._aBoards[ PIECE_ROOK ] |= newRook;
+                } else {
+                    // If king moving and not castling ...
+                    _bFlags &= ~STATE_CAN_CASTLE_MASK;
                 }
             }
         }
@@ -414,6 +409,13 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         _nEval = 0;
 
         return _nEval;
+    }
+
+    bool SetCastledFlags( int bWhichCastleSide )
+    {
+        _bFlags     &= ~STATE_CAN_CASTLE_MASK;
+        _bMoveType  |=  bWhichCastleSide     ;
+        return true;
     }
 };
 
