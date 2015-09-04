@@ -36,18 +36,19 @@ struct RawBoard_t
 
         for( int iCell = 0; iCell < 64; iCell++, p++ )
         {
-            char iCol    = iCell & 7;
-            char iRow    = iCell / 8;
+            char iCol       = iCell & 7;
+            char iRow       = iCell / 8;
 
-            int  iPiece  = *p & 0xF;
-            char cPiece  = aPIECES [ iPiece  ];
-            bool bOdd    = ((iCell + iRow) & 1);
+            int  iPiece     = *p & 0xF;
+            char cPiece     = aPIECES [ iPiece  ];
+
+            bool bCellBlack = ((iCell + iRow) & 1);
 
             if (bPrintRankFile && (iCol == 0))
                 printf( "%c ", aRANK[ 7 - iCell/8 ] );
 
             if( (iPiece & 7) == PIECE_EMPTY )
-                printf( "%c", " ."[ bOdd ] );
+                printf( "%c", "_ "[ bCellBlack ] );
             else
                 printf( "%c", cPiece );
 
