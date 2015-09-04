@@ -80,6 +80,18 @@ struct Move_t
     bitboard_t bBoardDst;
 };
 
+/*
+TODO:
+    Also, do not allow the en passant flag when the en
+    passant capture is not legal!  Setting this flag
+    willy nilly after each double pawn push means that
+    the position after 1.d4 d5 2.Nf3 comes out different
+    from 1.Nf3 d5 2.d4.
+
+    Subject: PGN upddate and revisions
+    https://groups.google.com/forum/#!topic/rec.games.chess.computer/FtUoFFfNXfQ
+*/
+
 
 enum StateFlags_e
 {
