@@ -235,7 +235,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         bitboard_t board = 0;
 
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
-            board |= _player[ iPlayer ].GetPlayerAllPieces( iPlayer );
+            board |= GetPlayerAllPieces( iPlayer );
 
         return board;
     }
