@@ -9,6 +9,7 @@
 #include "utility.h"
 #include "bitboard.h"
 #include "pieces.h"
+#include "rawboard.h"
 #include "state.h"
 #include "game.h"
 #include "eval.h"
