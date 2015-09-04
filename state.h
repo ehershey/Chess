@@ -21,7 +21,7 @@ struct StateBitBoard_t
 
     // Merge all the bitboards into a single raw board
     // Empty cells are NOT touched so it is safe to call this with both players
-    void BitBoardsToRawBoard( int iPlayer, Board_t *board_ )
+    void BitBoardsToRawBoard( int iPlayer, RawBoard_t *board_ )
     {
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
@@ -156,7 +156,7 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         }
     }
 
-    void _GetBoard( Board_t& board )
+    void _GetRawBoard( RawBoard_t& board )
     {
         board.Init();
 
@@ -169,15 +169,15 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
 
     void CompactPrintBoard( bool bPrintRankFile = true )
     {
-        Board_t board;
-        _GetBoard( board );
+        RawBoard_t board;
+        _GetRawBoard( board );
         board.PrintCompact( bPrintRankFile );
     }
 
     void PrettyPrintBoard( bool bPrintRankFile = true )
     {
-        Board_t board;
-        _GetBoard( board );
+        RawBoard_t board;
+        _GetRawBoard( board );
         board.PrintPretty( bPrintRankFile );
     }
 

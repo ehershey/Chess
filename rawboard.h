@@ -7,7 +7,7 @@
     // Version 3: int32[8]    //  32 bytes = 1 nibble/cell
     const int  CELLS_SIZE = 64;
 
-struct Board_t
+struct RawBoard_t
 {
 //    enum 
 //    {
