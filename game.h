@@ -32,7 +32,20 @@ struct ChessGame_t
         return _aMoves[ _nMoves ].GetColorPlayer();
     }
 
-    void PrettyPrintBoard()
+    void Print( bool bAnsiOutput )
+    {
+        if( bAnsiOutput )
+            PrintBoardPretty();
+        else
+            PrintBoardCompact();
+    }
+
+    void PrintBoardCompact()
+    {
+        _aMoves[ _nMoves ].CompactPrintBoard();
+    }
+
+    void PrintBoardPretty()
     {
         _aMoves[ _nMoves ].PrettyPrintBoard();
     }

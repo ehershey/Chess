@@ -144,7 +144,7 @@ int main( const int nArg, const char *aArg[] )
     while( !bQuit )
     {
         // if (gbBoardValid)
-        /*         */ game.PrettyPrintBoard();
+        /*         */ game.Print( gbAnsiOutput );
         iNextPlayer = game.PlayerToPlayNext();
         printf( "%c>", aPLAYERS[ iNextPlayer ] );
 
