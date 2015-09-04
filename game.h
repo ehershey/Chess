@@ -6,6 +6,12 @@ struct ChessGame_t
     int     _nMoves;
     State_t _aMoves[ MAX_GAME_MOVES ];
 
+    void Reset()
+    {
+        _nMoves = 0;
+        _aMoves[0].Zero();
+    }
+
     void Init()
     {
         _nMoves = 0;

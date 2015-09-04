@@ -14,9 +14,11 @@
 #include "eval.h"
 #include "search.h"
 
+    bool bAnsiOutput = false;
+
 // BEGIN OMP
-int gnThreadsMaximum = 0 ;
-int gnThreadsActive  = 0 ; // 0 = auto detect; > 0 manual # of threads
+    int gnThreadsMaximum = 0 ;
+    int gnThreadsActive  = 0 ; // 0 = auto detect; > 0 manual # of threads
 
 void StartupMulticore()
 {
@@ -107,6 +109,7 @@ int main( const int nArg, const char *aArg[] )
     StartupMulticore();
 
     ChessGame_t game;
+    game.Reset();
 
     bool    bQuit = false;
     int     iNextPlayer = 0;
