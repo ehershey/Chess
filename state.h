@@ -19,7 +19,9 @@ struct StateBitBoard_t
         }
     }
 
-    void BitBoardToRaw( int iPlayer, Board_t *board_ )
+    // Merge all the bitboards into a single raw board
+    // Empty cells are NOT touched so it is safe to call this with both players
+    void BitBoardsToRawBoard( int iPlayer, Board_t *board_ )
     {
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
         {
@@ -161,7 +163,7 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
         {
             StateBitBoard_t *pState = &_player[ iPlayer ];
-            pState->BitBoardToRaw( iPlayer, &board );
+            pState->BitBoardsToRawBoard( iPlayer, &board );
         }
     }
 
