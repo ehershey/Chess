@@ -160,6 +160,11 @@ struct State_t
     uint8_t         _nChildren  ; // +1  111  127  total children
 //  uint8_t         _iGamePhase ; // +1  112  128  0=early game, 0x10=mid-game, 0x20=end-game
 
+    void Zero()
+    {
+        memset( this, 0, sizeof( *this ) );
+    }
+
     void Init()
     {
 printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
