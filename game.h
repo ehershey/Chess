@@ -9,13 +9,13 @@ struct ChessGame_t
     void Reset()
     {
         _nMoves = 0;
-        _aMoves[0].Zero();
+        _aMoves[ _nMoves ].Zero();
     }
 
     void Init()
     {
         _nMoves = 0;
-        _aMoves[ 0 ].Init();
+        _aMoves[ _nMoves ].Init();
     }
 
     void NextTurn()
