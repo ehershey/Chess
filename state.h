@@ -301,7 +301,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
         int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
-        int bCanCastle  = bCanCastleK | bCanCastleQ;
+        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
         if( iPieceSrc == PIECE_ROOK )
         {
@@ -332,16 +332,28 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                 {
                     if( bCanCastleQ && (fromRankFile == 0x04) && (toRankFile == 0x00) )
                     {
-                        // Place King 0x02 C1 -- IsCheck()?
-                        // Place King 0x03 D1 -- IsCheck()?
-                        bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
+                        // Verify Player's rook on toRankFile!
+                        if (iPieceDst == PIECE_ROOK)
+                        {
+                            // Place King 0x02 C1 -- IsCheck()?
+                            // Place King 0x03 D1 -- IsCheck()?
+                            bool bPassThroughCheck = false;
+                            if( !bPassThroughCheck )
+                                bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
+                        }
                     }
 
                     if( bCanCastleK && (fromRankFile == 0x05) && (toRankFile == 0x07) )
                     {
-                        // Place King 0x05 F1 -- IsCheck()?
-                        // Place King 0x06 G1 -- IsCheck()?
-                        bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
+                        // Verify Player's rook on toRankFile!
+                        if (iPieceDst == PIECE_ROOK)
+                        {
+                            // Place King 0x05 F1 -- IsCheck()?
+                            // Place King 0x06 G1 -- IsCheck()?
+                            bool bPassThroughCheck = false;
+                            if( !bPassThroughCheck )
+                                bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
+                        }
                     }
                 }
 
@@ -349,16 +361,28 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                 {
                     if( bCanCastleQ && (fromRankFile == 0x74) && (toRankFile == 0x70) )
                     {
-                        // Place King 0x72 C8 -- IsCheck()?
-                        // Place King 0x73 D8 -- IsCheck()?
-                        bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
+                        // Verify Player's rook on toRankFile!
+                        if (iPieceDst == PIECE_ROOK)
+                        {
+                            // Place King 0x72 C8 -- IsCheck()?
+                            // Place King 0x73 D8 -- IsCheck()?
+                            bool bPassThroughCheck = false;
+                            if( !bPassThroughCheck )
+                                bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
+                        }
                     }
 
                     if( bCanCastleK && (fromRankFile == 0x75) && (toRankFile == 0x77) )
                     {
-                        // Place King 0x75 F8 -- IsCheck()?
-                        // Place King 0x76 G8 -- IsCheck()?
-                        bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
+                        // Verify Player's rook on toRankFile!
+                        if (iPieceDst == PIECE_ROOK)
+                        {
+                            // Place King 0x75 F8 -- IsCheck()?
+                            // Place King 0x76 G8 -- IsCheck()?
+                            bool bPassThroughCheck = false;
+                            if( !bPassThroughCheck )
+                                bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
+                        }
                     }
                 }
 
