@@ -106,8 +106,10 @@ int main( const int nArg, const char *aArg[] )
 
     StartupMulticore();
 
-    State_t state;
+    ChessGame_t game;
+
     bool    bQuit = false;
+    int     iNextPlayer = 0;
     int     nSrcRF;
     int     nDstRF;
     int     iSrcPiece;
@@ -125,8 +127,10 @@ int main( const int nArg, const char *aArg[] )
     // wait for command
     while( !bQuit )
     {
-        state.PrettyPrintBoard();
-        printf( ">" );
+        // if (gbBoardValid)
+        /*         */ game.PrettyPrintBoard();
+        iNextPlayer = game.PlayerToPlayNext();
+        printf( "%c>", aPLAYERS[ iNextPlayer ] );
 
         fflush( stdin );
         char   sInput[ 32 ];
@@ -161,6 +165,8 @@ int main( const int nArg, const char *aArg[] )
                         //iDstPiece = BoardGetPiece( nDsrRF );
                         //bool bDirectCaptures  = // Player x Enemy
                         //bool bIndirectCapture = // pawn: en-passant
+
+                        game.NextTurn();
                     }
                     break;
 
@@ -175,7 +181,7 @@ int main( const int nArg, const char *aArg[] )
             if( strcmp( aCmds[0], "quit" ) >= 0 )
                 bQuit = true;
             if( strcmp( aCmds[0], "ng" ) == 0 )
-                state.Init();
+                game.Init();
         }
     }; // while bGameRunning
 
