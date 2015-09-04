@@ -117,24 +117,38 @@ struct StateBitBoard_t
 
 enum StateFlags_e
 {
-     STATE_CHECK             = (1 << 0)
-    ,STATE_CHECKMATE         = (1 << 1)
-    ,STATE_STALEMATE         = (1 << 2)
-    ,STATE_CAPTURE_ENEMY     = (1 << 3)
+     STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black
+    ,STATE_CHECK             = (1 << 1)
+    ,STATE_CHECKMATE         = (1 << 2)
+    ,STATE_STALEMATE         = (1 << 3)
     ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4)
     ,STATE_CAN_CASTLE_K_SIDE = (1 << 5)
-    ,STATE_CASTLED_Q_SIDE    = (1 << 6)
-    ,STATE_CASTLED_K_SIDE    = (1 << 7)
+    ,STATE_GAME_MID          = (1 << 6) // 1=mid game, 0=early
+    ,STATE_GAME_LATE         = (1 << 7) // 1=end game, 0=early
+
+// 15 different states
+// http://chessprogramming.wikispaces.com/Encoding+Moves
+    // 4-bit code: promotion capture special1 special0
+    ,STATE_MOVE_NORMAL       = (0 << 8) // special0
+    ,STATE_MOVE_NORMAL_MASK  = (1 << 8) // special0 = 0 move without capture
+    ,STATE_MOVE_PAWN_DOUBLE  = (1 << 8) // special0 = 1 pawn moves 2 squares
+    ,STATE_CASTLED_Q_SIDE    = (2 << 8) // special1 = Castle
+    ,STATE_CASTLED_K_SIDE    = (3 << 8)
+    ,STATE_CAPTURE_ENEMY     = (4 << 8) // Capture
+    ,STATE_CAPTURE_EP        = (5 << 8)
+    ,STATE_PROMOTE_KNIGHT    = (8 << 8) // Promote
+    ,STATE_PROMOTE_BISHOP    = (9 << 8) // special0 = piece type
+    ,STATE_PROMOTE_ROOK      = (10<< 8) // special1 = piece type
+    ,STATE_PROMOTE_QUEEN     = (11<< 8) // special1 = piece type
+
   //,STATE_HAS_CASTLED       = (1 << 3) // CanCastle( _flags & (STATE_CAN_CASTLE_K_SIDE|STATE_CAN_CASTLE_Q_SIDE) )
-  //,STATE_GAME_MID          = (1 << 8) // 1=mid game, 0=early or end-game
 };
 
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ]; // 96 bytes if not storing board[ PIECE_EMPTY ]
     //                            //      96  112 bytes
-    int16_t         _nEval      ; // +2   98  114
-    uint16_t        _nTurn      ; // +2  100  116  Even=White, Odd=Black
+     int16_t        _nEval      ; // +2   98  114
     uint16_t        _iParent    ; // +2  102  118  i-node of parent
     uint16_t        _iFirstChild; // +2  104  120  i-node of first child
     uint16_t        _bFlags     ; // +1  105  122
@@ -152,8 +166,7 @@ printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
 printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
 
         _nEval  = 0;
-        _bFlags = 0;
-        _nTurn  = 0;
+        _bFlags = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
         _iFrom  = 0;
         _iTo    = 0;
 
@@ -208,8 +221,9 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         board.Print( bPrintRankFile );
     }
 
-inline uint8_t GetColorPlayer() { return  _nTurn & 1; }
-inline uint8_t GetColorEnemy () { return ~_nTurn & 1; }
+inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
+inline uint8_t GetColorEnemy () { return ~_bFlags &  STATE_WHICH_PLAYER; }
+inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
     bitboard_t GetAllPieces( int iPlayer )
     {
