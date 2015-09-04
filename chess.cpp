@@ -189,15 +189,26 @@ int main( const int nArg, const char *aArg[] )
 
                 case 'q':
                     printf( "Quiting...\n" );
+                    // TODO: Send STOP SHUTDOWN to search threads
                     bQuit = true;
                     break;
             }
         }
         else
+        if( aLens[0] == 2 )
         {
-            if( strcmp( aCmds[0], "quit" ) >= 0 )
-                bQuit = true;
             if( strcmp( aCmds[0], "ng" ) == 0 )
+                game.Init();
+        }
+        else
+        {
+            if( strcmp( aCmds[0], "quit" ) == 0 )
+                bQuit = true;
+            else
+            if( strcmp( aCmds[0], "random") == 0 )
+                 ; // ignore xboard command
+            else
+            if( strcmp( aCmds[0], "new" ) == 0 )
                 game.Init();
         }
     }; // while bGameRunning
