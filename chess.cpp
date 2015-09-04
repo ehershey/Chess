@@ -11,6 +11,7 @@
 #include "pieces.h"
 #include "state.h"
 #include "game.h"
+#include "eval.h"
 
 // BEGIN OMP
 int gnThreadsMaximum = 0 ;
@@ -55,27 +56,39 @@ int main( const int nArg, const char *aArg[] )
 #endif
 
 #if 1
-        printf( "= Queen - Print each potential move =\n" );
+    {
+        /*
+            uint32_t aEVAL_LOCATION_QUEEN[ 8 ] =
+            {   // ABCDEFGH
+                 0x // 8
+                ,0x // 7
+                ,0x // 6
+                ,0x // 5
+                ,0x // 4
+                ,0x // 3
+                ,0x // 2
+                ,0x // 1
+            };
+        */
+        bitboard_t board;
+        printf( "= Queen = # of Moves/Cell\n" );
 
-        uint8_t nRankFile = 0x24;
-        bitboard_t board = BitBoardMovesColorQueen( nRankFile );
-
-        uint8_t nMoves;
-        uint8_t aMoves[ 32 ];
-        BitBoardToRankFileAllMoves( board, nMoves, aMoves );
-
-        BitBoardPrint( board );
-
-        printf( "  Moves: %d\n", nMoves );
-        for( int iMove = 0; iMove < nMoves; iMove++ )
+        for( int cell = 0; cell < 64; cell++ )
         {
-            uint8_t nRF  = aMoves[ iMove ];
-            uint8_t nRow; // Rank
-            uint8_t nCol; // File
-            RankFileToColRow( nRF, nCol, nRow );
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+            board = BitBoardMovesColorQueen( rankfile );
 
-            printf( "  [%2d]: 0x%02X %c%c\n", iMove, aMoves[ iMove ], RankFileToFile( nRF ), RankFileToRank( nRF ) );
+            const int SIZE = 64;
+            uint8_t nMoves;
+            uint8_t aMoves[ SIZE ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+
+            printf( "# 0x%1X ", nMoves );
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
         }
+    }
 #endif
 
     // spin-lock
