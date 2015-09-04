@@ -23,3 +23,8 @@ const char aPLAYERS[] = "WB "; // Player 3 is to display empty cell
 
 // http://www.stmintz.com/ccc/index.php?id=424966
 const int MAX_POSITION_MOVES = 256; // Theoritical max moves from any position is ~218
+
+// Technically multiple queens could cover every square on the board
+// bump to 64 when needed
+// See: BitBoardToRankFileAllMoves()
+const int MAX_PIECE_MOVES = 32;
