@@ -12,12 +12,13 @@
 #include "state.h"
 #include "game.h"
 #include "eval.h"
+#include "search.h"
 
 // BEGIN OMP
 int gnThreadsMaximum = 0 ;
 int gnThreadsActive  = 0 ; // 0 = auto detect; > 0 manual # of threads
 
-void InitMulticore()
+void StartupMulticore()
 {
 // BEGIN OMP
     gnThreadsMaximum = omp_get_num_procs();
@@ -38,61 +39,147 @@ void InitMulticore()
     size_t nMemState = sizeof( State_t[ MAX_POOL_MOVES ] );
     printf( "Mem/Core: %u bytes (%u KB)\n", (uint32_t) nMemState, (uint32_t) nMemState/1024 );
 }
+
+void ShutdownMulticore()
+{
+    for( int iCore = 0; iCore < gnThreadsActive; iCore++ )
+    {
+        delete [] aMovePool[ iCore ];
+    }
+}
 // END OMP
+
+int INVALID_LOCATION = -1;
+
+int GetInputLocation( char *pText, size_t nLen )
+{
+    char *p   = pText;
+    int   nRF = INVALID_LOCATION;
+
+    if (nLen < 2)
+        return nRF;
+
+    bool bUpper  = (p[0] >= 'A') && (p[0] <= 'H');
+    bool bLower  = (p[0] >= 'a') && (p[0] <= 'h');
+    bool bNumber = (p[1] >= '0') && (p[1] <= '7');
+
+    if ((nLen > 1) && (bUpper || bLower) && bNumber)
+    {
+        nRF = (((p[0] - 1) & 7) << 4) + ((p[1] - 1) & 7);
+printf( "RankFile: 0x%02X\n", nRF );
+    }
+
+    return nRF;
+}
+
+
+/** Reads input string into arguments
+    @Note: Replaces arg seperator (space) with NULL
+*/
+void GetInputArguments( char *sInput, int nMaxCmds,
+    int& nCmds_, char *aCmds_[], int aLens_[] )
+{
+    char *start = sInput;
+    int   iCmds = 0;
+
+    aCmds_[ iCmds ] = sInput;
+    aLens_[ iCmds ] = 0;
+
+    for( char *end = sInput; *end && (iCmds < nMaxCmds); end++ )
+    {
+        if( *end == ' ' || *end == 0xA || *end == 0xD )
+        {
+            aLens_[ iCmds ] = end - start;
+            iCmds++;
+            aCmds_[ iCmds ] = start = end + 1;
+            *end = 0;
+        }
+    }
+
+    nCmds_ = iCmds;
+}
 
 int main( const int nArg, const char *aArg[] )
 {
     (void) nArg;
     (void) aArg;
 
-    InitMulticore();
+    StartupMulticore();
 
     State_t state;
-    state.Init();
+    bool    bQuit = false;
+    int     nSrcRF;
+    int     nDstRF;
+    int     iSrcPiece;
+    int     iDstPiece;
 
-#if 0
-    //state.Dump();
-    state.PrettyPrintBoard();
-#endif
+    int     MAX_COMMANDS = 4;
+    int     nCmds;
+    char   *aCmds[ MAX_COMMANDS ];
+    int     aLens[ MAX_COMMANDS ]; // length of each command
 
-#if 1
-    {
-        /*
-            uint32_t aEVAL_LOCATION_QUEEN[ 8 ] =
-            {   // ABCDEFGH
-                 0x // 8
-                ,0x // 7
-                ,0x // 6
-                ,0x // 5
-                ,0x // 4
-                ,0x // 3
-                ,0x // 2
-                ,0x // 1
-            };
-        */
-        bitboard_t board;
-        printf( "= Queen = # of Moves/Cell\n" );
-
-        for( int cell = 0; cell < 64; cell++ )
-        {
-            uint8_t col, row, rankfile;
-            CellToColRow( cell, col, row );
-            rankfile = ColRowToRankFile( col, row );
-            board = BitBoardMovesColorQueen( rankfile );
-
-            const int SIZE = 64;
-            uint8_t nMoves;
-            uint8_t aMoves[ SIZE ];
-            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
-
-            printf( "# 0x%1X ", nMoves );
-            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
-        }
-    }
-#endif
+(void) iSrcPiece;
+(void) iDstPiece;
 
     // spin-lock
     // wait for command
+    while( !bQuit )
+    {
+        state.PrettyPrintBoard();
+        printf( ">" );
+
+        fflush( stdin );
+        char   sInput[ 32 ];
+        fgets( sInput, sizeof( sInput ), stdin );
+
+        GetInputArguments( sInput, MAX_COMMANDS, nCmds, aCmds, aLens );
+
+        if( aLens[0] == 1 )
+        {
+            switch( aCmds[0][0] )
+            {
+                case 'e':
+                    printf( "Edit: %s\n", aCmds[1] );
+                    nSrcRF = GetInputLocation( aCmds[1], aLens[1] );
+                    if (nSrcRF == INVALID_LOCATION)
+                        printf( "Error. Invalid location\n" );
+                    else
+                    {
+                        //iSrcPiece = GetPiece( pParam+4, nLenParam - 4 );
+                    }
+                    break;
+
+                case 'm':
+                    printf( "Param: %s\n", aCmds[1] );
+                    nSrcRF = GetInputLocation( aCmds[1]+0, aLens[1]-0 );
+                    nDstRF = GetInputLocation( aCmds[1]+2, aLens[1]-2 );
+                    if ((nSrcRF == INVALID_LOCATION) || (nDstRF == INVALID_LOCATION))
+                        printf( "Error. Invalid location\n" );
+                    else
+                    {
+                        //iSrcPiece = BoardGetPiece( nSrcRF );
+                        //iDstPiece = BoardGetPiece( nDsrRF );
+                        //bool bDirectCaptures  = // Player x Enemy
+                        //bool bIndirectCapture = // pawn: en-passant
+                    }
+                    break;
+
+                case 'q':
+                    printf( "Quiting...\n" );
+                    bQuit = true;
+                    break;
+            }
+        }
+        else
+        {
+            if( strcmp( aCmds[0], "quit" ) >= 0 )
+                bQuit = true;
+            if( strcmp( aCmds[0], "ng" ) == 0 )
+                state.Init();
+        }
+    }; // while bGameRunning
+
+    ShutdownMulticore();
 
     return 0;
 }
