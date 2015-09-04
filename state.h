@@ -50,6 +50,7 @@ struct PrettyPrintBoard_t
              printf( "  " );
              for( int x = 0; x < 8; x++ )
                printf( "%c ", aFILE[ x ] );
+            printf( "\n" );
         }
     }
 };
