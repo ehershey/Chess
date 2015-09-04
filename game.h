@@ -5,6 +5,31 @@ struct ChessGame_t
 {
     int     _nMoves;
     State_t _aMoves[ MAX_GAME_MOVES ];
+
+    void Init()
+    {
+        _nMoves = 0;
+        _aMoves[ 0 ].Init();
+    }
+
+    void NextTurn()
+    {
+        _nMoves++;
+        _aMoves[ _nMoves ] = _aMoves[ _nMoves-1 ];
+        _aMoves[ _nMoves ].TogglePlayer();
+//printf( "Moves[].Flags: %02X\n", _aMoves[ _nMoves]._bFlags );
+    }
+
+    int PlayerToPlayNext()
+    {
+//printf( "Moves: %d\n", _nMoves );
+        return _aMoves[ _nMoves ].GetColorPlayer();
+    }
+
+    void PrettyPrintBoard()
+    {
+        _aMoves[ _nMoves ].PrettyPrintBoard();
+    }
 };
 
 const int MAX_THREADS = 8;
