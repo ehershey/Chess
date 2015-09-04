@@ -115,7 +115,7 @@ int main( const int nArg, const char *aArg[] )
     int     iSrcPiece;
     int     iDstPiece;
 
-    int     MAX_COMMANDS = 4;
+    const int MAX_COMMANDS = 4;
     int     nCmds;
     char   *aCmds[ MAX_COMMANDS ];
     int     aLens[ MAX_COMMANDS ]; // length of each command
