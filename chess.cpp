@@ -136,6 +136,7 @@ int main( const int nArg, const char *aArg[] )
     int     nCmds;
     char   *aCmds[ MAX_COMMANDS ];
     int     aLens[ MAX_COMMANDS ]; // length of each command
+    bool    bBadCommand;
 
 (void) iSrcPiece;
 (void) iDstPiece;
@@ -155,6 +156,7 @@ int main( const int nArg, const char *aArg[] )
 
         GetInputArguments( sInput, MAX_COMMANDS, nCmds, aCmds, aLens );
 
+        bBadCommand = false;
         if( aLens[0] == 1 )
         {
             switch( aCmds[0][0] )
@@ -192,6 +194,10 @@ int main( const int nArg, const char *aArg[] )
                     // TODO: Send STOP SHUTDOWN to search threads
                     bQuit = true;
                     break;
+
+                default:
+                    bBadCommand = true;
+                    break;
             }
         }
         else
@@ -199,6 +205,8 @@ int main( const int nArg, const char *aArg[] )
         {
             if( strcmp( aCmds[0], "ng" ) == 0 )
                 game.Init();
+            else
+                bBadCommand = true;
         }
         else
         {
@@ -210,7 +218,12 @@ int main( const int nArg, const char *aArg[] )
             else
             if( strcmp( aCmds[0], "new" ) == 0 )
                 game.Init();
+            else
+                 bBadCommand = true;
         }
+
+        if( bBadCommand )
+            printf( "Ignored command: %s\n", aCmds[0] );
     }; // while bGameRunning
 
     ShutdownMulticore();
