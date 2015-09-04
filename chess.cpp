@@ -14,11 +14,26 @@
 #include "eval.h"
 #include "search.h"
 
-    bool bAnsiOutput = false;
+    bool gbAnsiOutput = false;
 
 // BEGIN OMP
     int gnThreadsMaximum = 0 ;
     int gnThreadsActive  = 0 ; // 0 = auto detect; > 0 manual # of threads
+
+void StartupCommandLine( const int nArg, const char *aArg[] )
+{
+#ifdef WIN32
+    gbAnsiOutput = false;
+#else
+    bAnsiOutput = true;
+#endif
+
+    for( int iArg = 1; iArg < nArg; iArg++ )
+    {
+        if (strcmp( aArg[ iArg ], "-ansi" ) == 0)
+            gbAnsiOutput = true;
+    }
+}
 
 void StartupMulticore()
 {
@@ -103,9 +118,7 @@ void GetInputArguments( char *sInput, int nMaxCmds,
 
 int main( const int nArg, const char *aArg[] )
 {
-    (void) nArg;
-    (void) aArg;
-
+    StartupCommandLine( nArg, aArg );
     StartupMulticore();
 
     ChessGame_t game;
