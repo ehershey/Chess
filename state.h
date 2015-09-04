@@ -225,9 +225,19 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 inline uint8_t GetColorEnemy () { return ~_bFlags &  STATE_WHICH_PLAYER; }
 inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
-    bitboard_t GetAllPieces( int iPlayer )
+    bitboard_t GetPlayerAllPieces( int iPlayer )
     {
         return _player[ iPlayer ].GetBoardAllPieces();
+    }
+
+    bitboard_t GetAllPieces()
+    {
+        bitboard_t board = 0;
+
+        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
+            board |= _player[ iPlayer ].GetPlayerAllPieces( iPlayer );
+
+        return board;
     }
 
     bool IsCheck()
