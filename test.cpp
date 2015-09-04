@@ -161,10 +161,9 @@ int main()
             rankfile = ColRowToRankFile( col, row );
             board = BitBoardMovesColorKnight( rankfile );
 
-            const int SIZE = 64;
             uint8_t nMoves;
-            uint8_t aMoves[ SIZE ];
-            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+            uint8_t aMoves[ MAX_PIECE_MOVES ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, MAX_PIECE_MOVES );
 
             printf( "# 0x%1X ", nMoves );
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
@@ -206,10 +205,8 @@ int main()
             rankfile = ColRowToRankFile( col, row );
             board = BitBoardMovesColorBishop( rankfile );
 
-            const int SIZE = 64;
-            uint8_t nMoves;
-            uint8_t aMoves[ SIZE ];
-            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+            uint8_t aMoves[ MAX_PIECE_MOVES ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, MAX_PIECE_MOVES );
 
             printf( "# 0x%1X ", nMoves );
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
@@ -226,10 +223,9 @@ int main()
         board |= BitBoardMovesColorBishop( 0x33 );
         board |= BitBoardMovesColorBishop( 0x34 );
 
-        const int SIZE = 64;
         uint8_t nMoves;
-        uint8_t aMoves[ SIZE ];
-        BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+        uint8_t aMoves[ MAX_PIECE_MOVES ];
+        BitBoardToRankFileAllMoves( board, nMoves, aMoves, MAX_PIECE_MOVES );
 
         BitBoardPrint( board );
 
@@ -328,6 +324,40 @@ int main()
 
 #endif
 
+#if 1
+    {
+        /*
+            uint32_t aEVAL_LOCATION_QUEEN[ 8 ] =
+            {   // ABCDEFGH
+                 0x // 8
+                ,0x // 7
+                ,0x // 6
+                ,0x // 5
+                ,0x // 4
+                ,0x // 3
+                ,0x // 2
+                ,0x // 1
+            };
+        */
+        bitboard_t board;
+        printf( "= Queen = # of Moves/Cell\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+            board = BitBoardMovesColorQueen( rankfile );
+
+            uint8_t nMoves;
+            uint8_t aMoves[ MAX_PIECE_MOVES ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, MAX_PIECE_MOVES );
+
+            printf( "# 0x%1X ", nMoves );
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+        }
+    }
+#endif
 
 // ===
 
