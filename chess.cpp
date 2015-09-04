@@ -26,7 +26,7 @@ void StartupCommandLine( const int nArg, const char *aArg[] )
 #ifdef WIN32
     gbAnsiOutput = false;
 #else
-    bAnsiOutput = true;
+    gbAnsiOutput = true;
 #endif
 
     for( int iArg = 1; iArg < nArg; iArg++ )
