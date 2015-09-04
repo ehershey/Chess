@@ -59,6 +59,24 @@ struct StateBitBoard_t
     }
 };
 
+
+struct Move_t
+{
+    // Location
+    uint8_t nSrcRF    ;
+    uint8_t nDstRF    ;
+
+    uint8_t iPlayerSrc; // which player
+    uint8_t iPlayerDst; // which player
+
+    // Piece
+    uint8_t iPieceSrc ;
+    uint8_t iPieceDst ;
+    uint8_t iEnemySrc ;
+    uint8_t iEnemyDst ;
+};
+
+
 enum StateFlags_e
 {
      STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black // Optimization: Could encode in _bMoveType, and use 4-bit of Piece type
@@ -101,7 +119,7 @@ struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ]; // 96 bytes if not storing board[ PIECE_EMPTY ]
     //                            //      96  112 bytes
-    uint8_t         _bFlags     ; // +1   97  113 
+    uint8_t         _bFlags     ; // +1   97  113
     uint8_t         _bMoveType  ; // +1   98  114  4-bites: Piece move 4-bits: Type of move or capture
     uint16_t        _iParent    ; // +2  100  116  i-node of parent
     uint16_t        _iFirstChild; // +2  102  118  i-node of first child
@@ -210,7 +228,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return board;
     }
 
-    bool IsCheck()
+    bool IsCheck() // TODO: uint8_t nKingRankFile = 0xFF
     {
         uint8_t iPlayer = GetColorPlayer();
         uint8_t iEnemy  = GetColorEnemy ();
@@ -426,6 +444,47 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     {
 (void) fromRankFile;
 (void) toRankFile ;
+    }
+
+    Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
+    {
+        uint8_t iPlayer    = GetColorPlayer();
+        uint8_t iEnemy     = GetColorEnemy ();
+
+        uint8_t iPieceSrc  = _player[ iPlayer ].GetPiece( fromRankFile );
+        uint8_t iPieceDst  = _player[ iPlayer ].GetPiece( toRankFile   );
+        uint8_t iEnemySrc  = _player[ iEnemy  ].GetPiece( fromRankFile );
+        uint8_t iEnemyDst  = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
+
+        Move_t move;
+
+        move.nSrcRF = fromRankFile;
+        move.nDstRF = toRankFile  ;
+
+        move.iPieceSrc = iPieceSrc;
+        move.iPieceDst = iPieceDst;
+        move.iEnemySrc = iEnemySrc;
+        move.iEnemyDst = iEnemyDst;
+
+        return move;
+    }
+
+    void MoveOrCapture( uint8_t fromRankFile, uint8_t toRankFile )
+    {
+        Move_t move = MakeMove( fromRankFile, toRankFile );
+
+        // Move should already be verified:
+        // iPieceSrc != PIECE_EMPTY
+        // iPieceDst != PIECE_EMPTY
+        if ((move.iPieceDst == PIECE_EMPTY) && (move.iEnemyDst == PIECE_EMPTY))
+            return;
+
+        // if dst square is empty, the IsMove()
+        // Exception: If King tries to capture same color rook
+        if ((move.iPieceDst == PIECE_EMPTY) && (move.iEnemyDst == PIECE_EMPTY))
+            Move( fromRankFile, toRankFile );
+        else
+            Capture( fromRankFile, toRankFile );
     }
 
     float Eval()
