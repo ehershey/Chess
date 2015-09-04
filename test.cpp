@@ -27,7 +27,7 @@ int main()
         uint8_t col, row, rankfile = 0x30; // A4
         RankFileToColRow( rankfile, col, row );
         printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
-    board = BitBoardMovesColorKnight( rankfile ); 
+    board = BitBoardMovesColorKnight( rankfile );
     BitBoardPrint( board );
     int moves = bitcount( board );
     printf( "%d max potential moves\n", moves );
@@ -123,9 +123,10 @@ int main()
         }
 #endif
 
-#if 1
-    bitboard_t board;
-    printf( "= Knight Moves =\n" );
+#if 0
+    {
+        bitboard_t board;
+        printf( "= Knight Moves =\n" );
 
         //board = BitBoardMovesColorKnight( 0x33 ); // D4
         //board = BitBoardMovesColorKnight( 0x30 ); // A4
@@ -133,7 +134,6 @@ int main()
         //BitBoardPrint( board );
         //printf( "\n" );
 
-//if(1)
         for( int cell = 0; cell < 64; cell++ )
         {
             uint8_t col, row, rankfile;
@@ -145,27 +145,108 @@ int main()
             BitBoardPrint( board );
             printf( "\n" );
         }
+    }
 #endif
 
 #if 0
-    bitboard_t board;
-    printf( "= Bishop Moves =\n" );
-
-        BitBoardPrint( board );
-        printf( "\n" );
+    {
+        // uint32_t aEVAL_LOCATION_KNIGHT[8] =
+        bitboard_t board;
+        printf( "= Knight = # of Moves/Cell\n" );
 
         for( int cell = 0; cell < 64; cell++ )
         {
             uint8_t col, row, rankfile;
             CellToColRow( cell, col, row );
             rankfile = ColRowToRankFile( col, row );
+            board = BitBoardMovesColorKnight( rankfile );
+
+            const int SIZE = 64;
+            uint8_t nMoves;
+            uint8_t aMoves[ SIZE ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+
+            printf( "# 0x%1X ", nMoves );
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+        }
+    }
+#endif
+
+// ===
+
+#if 0
+    {
+        bitboard_t board;
+        printf( "= Bishop = Moves =\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+            board = BitBoardMovesColorBishop( rankfile );
 
             printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
-            board = BitBoardMovesColorBishop( rankfile );
             BitBoardPrint( board );
             printf( "\n" );
         }
+    }
 #endif
+
+#if 0
+    {
+        // uint32_t aEVAL_LOCATION_BISHOP[8] =
+        bitboard_t board;
+        printf( "= Bishop = # of Moves/Cell\n" );
+
+        for( int cell = 0; cell < 64; cell++ )
+        {
+            uint8_t col, row, rankfile;
+            CellToColRow( cell, col, row );
+            rankfile = ColRowToRankFile( col, row );
+            board = BitBoardMovesColorBishop( rankfile );
+
+            const int SIZE = 64;
+            uint8_t nMoves;
+            uint8_t aMoves[ SIZE ];
+            BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+
+            printf( "# 0x%1X ", nMoves );
+            printf( "[%d,%d]: 0x%02X %c%c\n", col, row, rankfile, aFILE[ col ], aRANK[ row ] );
+        }
+    }
+#endif
+
+
+#if 0
+        printf( "= Bishop = Print each potential move\n" ); // 26
+
+        uint8_t nRankFile = 0x24;
+        bitboard_t board = 0;
+        board |= BitBoardMovesColorBishop( 0x33 );
+        board |= BitBoardMovesColorBishop( 0x34 );
+
+        const int SIZE = 64;
+        uint8_t nMoves;
+        uint8_t aMoves[ SIZE ];
+        BitBoardToRankFileAllMoves( board, nMoves, aMoves, SIZE );
+
+        BitBoardPrint( board );
+
+        printf( "  Moves: %d\n", nMoves );
+        for( int iMove = 0; iMove < nMoves; iMove++ )
+        {
+            uint8_t nRF  = aMoves[ iMove ];
+            uint8_t nRow; // Rank
+            uint8_t nCol; // File
+            RankFileToColRow( nRF, nCol, nRow );
+
+            printf( "  [%2d]: 0x%02X %c%c\n", iMove, aMoves[ iMove ], RankFileToFile( nRF ), RankFileToRank( nRF ) );
+        }
+#endif
+
+// ==========
+
 
 #if 0
     bitboard_t board;
@@ -248,6 +329,7 @@ int main()
 #endif
 
 
+// ===
 
 #if 0
     {
