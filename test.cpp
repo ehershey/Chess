@@ -12,6 +12,35 @@ int main()
 {
 
 #if 0
+    // Input
+        size_t nLenInput = 0;
+        size_t nLenCmd   = 0;
+        size_t nLenParam = 0;
+
+        for( char *p = sInput; *p; p++ )
+{
+printf( "[%u]: 0x%02X '%c'\n", (unsigned) (p - sInput), *p, *p );
+            if( *p == 0x0A || *p == 0x0D )
+                *p = 0;
+
+            if( *p == ' ' || *p == 0 )
+            {
+                nLenInput = strlen( sInput );
+                nLenCmd   = p - sInput;
+                pParam    = p + 1;
+                nLenParam = strlen( pParam );
+                *p      = 0;
+                break;
+            }
+}
+
+printf( "Len Input: %u\n", (unsigned) nLenInput );
+printf( "Len Comnd: %u\n", (unsigned) nLenCmd );
+printf( "Len Param: %u\n", (unsigned) nLenParam );
+#endif
+
+
+#if 0
     make_bitcount8();
 
 //    for( int i = 0; i < 256; i++ )
