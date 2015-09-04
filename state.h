@@ -63,17 +63,21 @@ struct StateBitBoard_t
 struct Move_t
 {
     // Location
-    uint8_t nSrcRF    ;
-    uint8_t nDstRF    ;
+    uint8_t    nSrcRF    ;
+    uint8_t    nDstRF    ;
 
-    uint8_t iPlayerSrc; // which player
-    uint8_t iPlayerDst; // which player
+    uint8_t    iPlayerSrc; // which player
+    uint8_t    iPlayerDst; // which player
 
     // Piece
-    uint8_t iPieceSrc ;
-    uint8_t iPieceDst ;
-    uint8_t iEnemySrc ;
-    uint8_t iEnemyDst ;
+    uint8_t    iPieceSrc ;
+    uint8_t    iPieceDst ;
+    uint8_t    iEnemySrc ;
+    uint8_t    iEnemyDst ;
+
+    // Board Location Mask
+    bitboard_t bBoardSrc;
+    bitboard_t bBoardDst;
 };
 
 
@@ -448,23 +452,21 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
     Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
     {
-        uint8_t iPlayer    = GetColorPlayer();
-        uint8_t iEnemy     = GetColorEnemy ();
-
-        uint8_t iPieceSrc  = _player[ iPlayer ].GetPiece( fromRankFile );
-        uint8_t iPieceDst  = _player[ iPlayer ].GetPiece( toRankFile   );
-        uint8_t iEnemySrc  = _player[ iEnemy  ].GetPiece( fromRankFile );
-        uint8_t iEnemyDst  = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
+        uint8_t iPlayer = GetColorPlayer();
+        uint8_t iEnemy  = GetColorEnemy ();
 
         Move_t move;
 
         move.nSrcRF = fromRankFile;
         move.nDstRF = toRankFile  ;
 
-        move.iPieceSrc = iPieceSrc;
-        move.iPieceDst = iPieceDst;
-        move.iEnemySrc = iEnemySrc;
-        move.iEnemyDst = iEnemyDst;
+        move.iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
+        move.iPieceDst = _player[ iPlayer ].GetPiece( toRankFile   );
+        move.iEnemySrc = _player[ iEnemy  ].GetPiece( fromRankFile );
+        move.iEnemyDst = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
+
+        move.bBoardSrc = BitBoardMakeLocation( fromRankFile );
+        move.bBoardDst = BitBoardMakeLocation( toRankFile   );
 
         return move;
     }
