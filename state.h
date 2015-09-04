@@ -61,48 +61,59 @@ struct StateBitBoard_t
 
 enum StateFlags_e
 {
-     STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black
+     STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black // Optimization: Could encode in _bMoveType, and use 4-bit of Piece type
     ,STATE_CHECK             = (1 << 1)
-    ,STATE_CHECKMATE         = (1 << 2)
-    ,STATE_STALEMATE         = (1 << 3)
-    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4)
-    ,STATE_CAN_CASTLE_K_SIDE = (1 << 5)
-    ,STATE_GAME_MID          = (1 << 6) // 1=mid game, 0=early
-    ,STATE_GAME_LATE         = (1 << 7) // 1=end game, 0=early
+//    ,STATE_CHECKMATE         = (1 << 2)
+//    ,STATE_STALEMATE         = (1 << 3)
+    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 3)
+    ,STATE_CAN_CASTLE_K_SIDE = (1 << 4)
 
-// 15 different states
-// http://chessprogramming.wikispaces.com/Encoding+Moves
+    ,STATE_CAN_CASTLE_MASK   = STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE
+};
+
+enum MoveFlags_e
+{
+    // 4-bits: which piece was moved
+     MOVE_PIECE_MASK        = 0x0F
+    ,MOVE_PIECE_SHIFT       = 0
+
+    // 15 different states
+    // http://chessprogramming.wikispaces.com/Encoding+Moves
     // 4-bit code: promotion capture special1 special0
-    ,STATE_MOVE_NORMAL       = (0 << 8) // special0
-    ,STATE_MOVE_NORMAL_MASK  = (1 << 8) // special0 = 0 move without capture
-    ,STATE_MOVE_PAWN_DOUBLE  = (1 << 8) // special0 = 1 pawn moves 2 squares
-    ,STATE_CASTLED_Q_SIDE    = (2 << 8) // special1 = Castle
-    ,STATE_CASTLED_K_SIDE    = (3 << 8)
-    ,STATE_CAPTURE_ENEMY     = (4 << 8) // Capture
-    ,STATE_CAPTURE_EP        = (5 << 8)
-    ,STATE_PROMOTE_KNIGHT    = (8 << 8) // Promote
-    ,STATE_PROMOTE_BISHOP    = (9 << 8) // special0 = piece type
-    ,STATE_PROMOTE_ROOK      = (10<< 8) // special1 = piece type
-    ,STATE_PROMOTE_QUEEN     = (11<< 8) // special1 = piece type
+    ,MOVE_FLAGS_MASK        = 0xF0
+    ,MOVE_FLAGS_SHIFT       = 4
+    ,MOVE_NORMAL            = (0 << MOVE_FLAGS_SHIFT) // special0
+    ,MOVE_NORMAL_MASK       = (1 << MOVE_FLAGS_SHIFT) // special0 = 0 move without capture
+    ,MOVE_PAWN_DOUBLE       = (1 << MOVE_FLAGS_SHIFT) // special0 = 1 pawn moves 2 squares
+    ,MOVE_CASTLED_Q_SIDE    = (2 << MOVE_FLAGS_SHIFT) // special1 = Castle
+    ,MOVE_CASTLED_K_SIDE    = (3 << MOVE_FLAGS_SHIFT)
+    ,MOVE_CAPTURE_ENEMY     = (4 << MOVE_FLAGS_SHIFT) // Capture
+    ,MOVE_CAPTURE_EP        = (5 << MOVE_FLAGS_SHIFT)
+    ,MOVE_PROMOTE_KNIGHT    = (8 << MOVE_FLAGS_SHIFT) // Promote
+    ,MOVE_PROMOTE_BISHOP    = (9 << MOVE_FLAGS_SHIFT) // special0 = piece type
+    ,MOVE_PROMOTE_ROOK      = (10<< MOVE_FLAGS_SHIFT) // special1 = piece type
+    ,MOVE_PROMOTE_QUEEN     = (11<< MOVE_FLAGS_SHIFT) // special1 = piece type
 
-  //,STATE_HAS_CASTLED       = (1 << 3) // CanCastle( _flags & (STATE_CAN_CASTLE_K_SIDE|STATE_CAN_CASTLE_Q_SIDE) )
+    ,MOVE_HAS_CASTLED_MASK  = MOVE_CASTLED_Q_SIDE | MOVE_CASTLED_K_SIDE
 };
 
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ]; // 96 bytes if not storing board[ PIECE_EMPTY ]
     //                            //      96  112 bytes
-     int16_t        _nEval      ; // +2   98  114
-    uint16_t        _iParent    ; // +2  102  118  i-node of parent
-    uint16_t        _iFirstChild; // +2  104  120  i-node of first child
-    uint16_t        _bFlags     ; // +1  105  122
-    uint8_t         _bMoveType  ; // +1  106       // http://chessprogramming.wikispaces.com/Encoding+Moves
+    uint8_t         _bFlags     ; // +1   97  113 
+    uint8_t         _bMoveType  ; // +1   98  114  4-bites: Piece move 4-bits: Type of move or capture
+    uint16_t        _iParent    ; // +2  100  116  i-node of parent
+    uint16_t        _iFirstChild; // +2  102  118  i-node of first child
+    uint8_t         _nChildren  ; // +1  103  119  total children
+    uint8_t         _nBestMoveRF; // +1  104  120
+     int16_t        _nEval      ; // +2  106  122
     uint8_t         _iFrom      ; // +1  107  123  RankFile (0xROWCOL)
     uint8_t         _iTo        ; // +1  108  124  RankFile (0xROWCOL)
-    uint8_t         _ePiece     ; // +1  109  125  which piece was moved
-    uint8_t         _bPawnsMoved; // +1  110  126  Bitflags if pawn[col] has moved
-    uint8_t         _nChildren  ; // +1  111  127  total children
-//  uint8_t         _iGamePhase ; // +1  112  128  0=early game, 0x10=mid-game, 0x20=end-game
+    uint8_t         _bPawnsMoved; // +1  109  125  8-bits: Bitflags if pawn[col] has moved
+    uint8_t         _iGamePhase ; // +1  110  126  0x00=early game, 0x80=mid-game, 0xFF=end-game
+    uint8_t         _pad1       ; // ============
+    uint8_t         _pad2       ; //     112  128
 
     void Zero()
     {
@@ -119,7 +130,6 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         _iFrom  = 0;
         _iTo    = 0;
 
-        _ePiece      = PIECE_EMPTY; // also encodes color to play next
         _bPawnsMoved = 0;
         _iParent     = 0;
         _iFirstChild = 1;
@@ -324,8 +334,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x02 C1 -- IsCheck()?
                         // Place King 0x03 D1 -- IsCheck()?
-                        _bFlags &= ~bCanCastle    ;
-                        _bFlags |=  STATE_CASTLED_Q_SIDE;
+                        _bFlags     &= ~bCanCastle         ;
+                        _bMoveType  |=  MOVE_CASTLED_Q_SIDE;
                         bJustCastled = true;
                     }
 
@@ -333,8 +343,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x05 F1 -- IsCheck()?
                         // Place King 0x06 G1 -- IsCheck()?
-                        _bFlags &= ~bCanCastle    ;
-                        _bFlags |=  STATE_CASTLED_K_SIDE;
+                        _bFlags     &= ~bCanCastle         ;
+                        _bMoveType  |=  MOVE_CASTLED_K_SIDE;
                         bJustCastled = true;
                     }
                 }
@@ -345,8 +355,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x72 C8 -- IsCheck()?
                         // Place King 0x73 D8 -- IsCheck()?
-                        _bFlags &= ~bCanCastle    ;
-                        _bFlags |=  STATE_CASTLED_Q_SIDE;
+                        _bFlags     &= ~bCanCastle         ;
+                        _bMoveType  |=  MOVE_CASTLED_Q_SIDE;
                         bJustCastled = true;
                     }
 
@@ -354,8 +364,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     {
                         // Place King 0x75 F8 -- IsCheck()?
                         // Place King 0x76 G8 -- IsCheck()?
-                        _bFlags &= ~bCanCastle    ;
-                        _bFlags |=  STATE_CASTLED_K_SIDE;
+                        _bFlags     &= ~bCanCastle         ;
+                        _bFlags     |=  MOVE_CASTLED_K_SIDE;
                         bJustCastled = true;
                     }
                 }
@@ -374,7 +384,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     bitboard_t newKing = 0;
                     bitboard_t newRook = 0;
 
-                    if( _bFlags & STATE_CASTLED_K_SIDE )
+                    if( _bMoveType & MOVE_CASTLED_K_SIDE )
                     {
                         newKing = BitBoardMakeLocation( 0x06 + 0x70*iPlayer );
                         newRook = BitBoardMakeLocation( 0x05 + 0x70*iPlayer );
