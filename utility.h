@@ -12,6 +12,9 @@
     +------------------------
       A1 B1 C1 D1 E1 F1 G1 H1
 */
+
+#undef _C2 // Stupid Windows Shit
+
 enum RankFileNames_e
 {
     _A8 = 0x70, _B8, _C8, _D8, _E8, _F8, _G8, _H8,
