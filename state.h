@@ -354,9 +354,9 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                 case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( nKingRF ); break;
                 case PIECE_PAWN  :
                     if( iEnemy == PLAYER_BLACK )
-                        movesPotential = BitBoardMovesWhitePawn( nKingRF );
+                        movesPotential = BitBoardMovesBlackPawn( nKingRF, _bPawnsMoved );
                     else
-                        movesPotential = BitBoardMovesBlackPawn( nKingRF );
+                        movesPotential = BitBoardMovesWhitePawn( nKingRF, _bPawnsMoved );
                     break;
 
                 // Any enemy pieces lay on the potential moves lines?
@@ -377,45 +377,53 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return false; // FIXME:
     }
 
-    bool IsValidMove( uint8_t fromRankFile, uint8_t toRankFile )
+    // Test trivial potential moves
+    bool IsValidMove( const Move_t& move )
     {
-        bitboard_t origin = BitBoardMakeLocation( fromRankFile );
-        bitboard_t dest   = BitBoardMakeLocation( toRankFile );
+        bool bValid = false;
 
-        // get the piece type
-        uint8_t iPlayer    = GetColorPlayer();
-        uint8_t iEnemy     = GetColorEnemy ();
+        if (move.iPieceSrc == PIECE_EMPTY)
+            return bValid;
 
-        uint8_t iPieceSrc  = _player[ iPlayer ].GetPiece( fromRankFile );
-        uint8_t iPieceDst  = _player[ iPlayer ].GetPiece( toRankFile );
-        uint8_t iEnemyDst  = _player[ iEnemy  ].GetPiece( toRankFile ); // check for capture
-
-        if( iPieceSrc == PIECE_EMPTY )
-            return false;
-
-(void) iPieceDst;
-(void) iEnemyDst;
-(void) origin;
-(void) dest;
+        switch( move.iPieceSrc )
+        {
+            case PIECE_PAWN  :
+                if (move.iPlayer == PLAYER_WHITE)
+                    bValid = BitBoardMovesWhitePawn( move.iSrcRF, _bPawnsMoved ) & move.bBoardDst ? 1:0 ;
+                else
+                    bValid = BitBoardMovesBlackPawn( move.iSrcRF, _bPawnsMoved ) & move.bBoardDst ? 1:0 ;
+                break;
+            case PIECE_ROOK  : bValid = BitBoardMovesColorRook  ( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
+            case PIECE_KNIGHT: bValid = BitBoardMovesColorKnight( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
+            case PIECE_BISHOP: bValid = BitBoardMovesColorBishop( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
+            case PIECE_QUEEN : bValid = BitBoardMovesColorQueen ( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
+            case PIECE_KING  :
+                bitboard_t bBoardCastle = 0;
+                if (move.iPlayer == PLAYER_WHITE)
+                {
+                    if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C1 );
+                    if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardCastle |= BitBoardMakeLocation( _G1 );
+                }
+                else
+                {
+                    if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C8 );
+                    if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardCastle |= BitBoardMakeLocation( _G8 );
+                }
+                bValid = BitBoardMovesColorKing  ( move.iSrcRF ) & (move.bBoardDst | bBoardCastle) ? 1:0 ;
+                break;
+        }
 
         // If dest is same color as player mark invalid
-
         // If new state IsCheck() not a valid move
-
         // If dest is enemy color
+        // Check Line-of-Sight from source to destination
 
-        // Except if King (this color) captures Rook (this color)
-        // And King hasn't moved
-        // And Rook hasn't moved
-
-        // Check Line-of-Sight from piece
-
-        return false; // FIXME:
+        return bValid;
     }
 
     bool Move( const Move_t& move )
     {
-        bool    bValid    = false;
+        bool bValid = false;
 
         switch( move.iPieceSrc )
         {
