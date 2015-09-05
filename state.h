@@ -97,8 +97,8 @@ struct Move_t
     uint8_t    iEnemy    ;
 
     // Location
-    uint8_t    nSrcRF    ;
-    uint8_t    nDstRF    ;
+    uint8_t    iSrcRF    ;
+    uint8_t    iDstRF    ;
 
     uint8_t    iPlayerSrc; // which player
     uint8_t    iPlayerDst; // which player
@@ -413,45 +413,89 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return false; // FIXME:
     }
 
-    bool Move( uint8_t fromRankFile, uint8_t toRankFile )
+    bool Move( const Move_t& move )
     {
         bool    bValid    = false;
 
-        uint8_t iPlayer   = GetColorPlayer();
-        uint8_t iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
+        switch( move.iPieceSrc )
+        {
+            case PIECE_PAWN  : bValid = MovePawn  ( move ); break;
+            case PIECE_ROOK  : bValid = MoveRook  ( move ); break;
+            case PIECE_KNIGHT: bValid = MoveKnight( move ); break;
+            case PIECE_BISHOP: bValid = MoveBishop( move ); break;
+            case PIECE_QUEEN : bValid = MoveQueen ( move ); break;
+            case PIECE_KING  : bValid = MoveKing  ( move ); break;
+            default:
+                printf( "ERROR: Invalid Move with unknown piece!\n" );
+        }
+
+        return bValid;
+    }
+
+    bool MoveBishop( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MoveKnight( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MovePawn( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MoveQueen( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MoveRook( const Move_t& move )
+    {
+        bool bValid = false;
 
         int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
-/*
-    switch( move.iPieceSrc )
-    {
-    }
-*/
-
-        if( iPieceSrc == PIECE_ROOK )
-        {
-            if( iPlayer == PLAYER_WHITE )
+            if (move.iPlayerSrc == PLAYER_WHITE)
             {
-                if( bCanCastleQ && (fromRankFile == 0x00) )
+                if( bCanCastleQ && (move.iSrcRF == _A1) )
                     _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-                if( bCanCastleK && (fromRankFile == 0x07) )
+                if( bCanCastleK && (move.iSrcRF == _A8) )
                     _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
             }
             else // PLAYER_BLACK
             {
-                if( bCanCastleQ && (fromRankFile == 0x70) )
+                if( bCanCastleQ && (move.iSrcRF == _A8) )
                     _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-                if( bCanCastleK && (fromRankFile == 0x77) )
+                if( bCanCastleK && (move.iSrcRF == _H8) )
                     _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
             }
-        }
-        else
-        if( iPieceSrc == PIECE_KING )
-        {
+
+        return bValid;
+    }
+
+    bool MoveKing( const Move_t& move )
+    {
+        bool bValid = false;
+
+        int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
+        int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
+        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
+
 //printf( ">Move() State.Flags: %08X\n", _bFlags );
 //printf( ">Move() KING  Castle: %s\n", bCanCastle ? "Yes" : "NO " );
             // Input: e1g1, e1c1, e8g8, e8c8
@@ -459,43 +503,48 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
             {
                 Castle_t castle;
                 castle.bWhichSide = 0;
-                castle.nNewKingRF = toRankFile;
+                castle.nNewKingRF = move.iDstRF;
 
-                if ((iPlayer == PLAYER_WHITE) && (fromRankFile == _E1))
+                if (move.iPlayer == PLAYER_WHITE)
                 {
-                    if (bCanCastleQ && (toRankFile == _C1))
+                    if (move.iSrcRF == _E1)
                     {
-                        castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
-                        castle.nNewKingRF = _C1;
-                        castle.nNewRookRF = _D1;
-                        castle.nOldRookRF = _A1;
-                    }
-                    else
-                    if (bCanCastleK && (toRankFile == _G1))
-                    {
-                        castle.bWhichSide = MOVE_CASTLED_K_SIDE;
-                        castle.nNewKingRF = _G1;
-                        castle.nNewRookRF = _F1;
-                        castle.nOldRookRF = _H1;
+                        if (bCanCastleQ && (move.iDstRF == _C1))
+                        {
+                            castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
+                            castle.nNewKingRF = _C1;
+                            castle.nNewRookRF = _D1;
+                            castle.nOldRookRF = _A1;
+                        }
+                        else
+                        if (bCanCastleK && (move.iDstRF == _G1))
+                        {
+                            castle.bWhichSide = MOVE_CASTLED_K_SIDE;
+                            castle.nNewKingRF = _G1;
+                            castle.nNewRookRF = _F1;
+                            castle.nOldRookRF = _H1;
+                        }
                     }
                 }
                 else
-                if ((iPlayer == PLAYER_BLACK) && (fromRankFile == _E8))
                 {
-                    if (bCanCastleQ && (toRankFile == _C8))
+                    if (move.iSrcRF == _E8)
                     {
-                        castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
-                        castle.nNewKingRF = _C8;
-                        castle.nNewRookRF = _D8;
-                        castle.nOldRookRF = _A8;
-                    }
-                    else
-                    if (bCanCastleK && (toRankFile == _G8))
-                    {
-                        castle.bWhichSide = MOVE_CASTLED_K_SIDE;
-                        castle.nNewKingRF = _G8;
-                        castle.nNewRookRF = _F8;
-                        castle.nOldRookRF = _H8;
+                        if (bCanCastleQ && (move.iDstRF == _C8))
+                        {
+                            castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
+                            castle.nNewKingRF = _C8;
+                            castle.nNewRookRF = _D8;
+                            castle.nOldRookRF = _A8;
+                        }
+                        else
+                        if (bCanCastleK && (move.iDstRF == _G8))
+                        {
+                            castle.bWhichSide = MOVE_CASTLED_K_SIDE;
+                            castle.nNewKingRF = _G8;
+                            castle.nNewRookRF = _F8;
+                            castle.nOldRookRF = _H8;
+                        }
                     }
                 }
 
@@ -505,7 +554,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     bitboard_t boardAll     = GetAllPieces();
                     bitboard_t boardNewKing = BitBoardMakeLocation( castle.nNewKingRF );
                     bitboard_t boardNewRook = BitBoardMakeLocation( castle.nNewRookRF );
-                    bitboard_t boardOldKing = BitBoardMakeLocation( fromRankFile );
+                    bitboard_t boardOldKing = BitBoardMakeLocation( move.iSrcRF );
                     bitboard_t boardOldRook = BitBoardMakeLocation( castle.nOldRookRF );
 
                     if (boardAll & boardNewKing) // if (iPieceDst == PIECE_EMPTY)
@@ -515,10 +564,10 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                         return false;
 
                     // Verify Player's own rook exists in the correct location
-                    if( ! (_player[ iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook) )
+                    if( ! (_player[ move.iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook) )
                         return false;
 
-                    bool bIsCheck0         = IsCheck( castle.nNewKingRF );
+                    bool bIsCheck0         = IsCheck( castle.nNewKingRF ); // FIXME: Verify enemy
                     bool bIsCheck1         = IsCheck( castle.nNewRookRF );
                     bool bPassThroughCheck = bIsCheck0 | bIsCheck1;
 
@@ -527,7 +576,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
                     // _bFlags |=  STATE_GAME_MID;
 
-                    Move_t moveKing = MakeMove( fromRankFile     , castle.nNewKingRF );
+                    Move_t moveKing = MakeMove( move.iSrcRF      , castle.nNewKingRF );
                     Move_t moveRook = MakeMove( castle.nOldRookRF, castle.nNewRookRF );
 
                     DoMove( moveKing ); // Remove old king, place new king
@@ -541,32 +590,50 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
             } // can castle
             else
             {
-                bitboard_t boardPotential = BitBoardMovesColorKing( fromRankFile );
-                bitboard_t boardNewKing   = BitBoardMakeLocation  ( toRankFile   );
+                bitboard_t boardPotential = BitBoardMovesColorKing( move.iSrcRF );
 
-                if( boardPotential & boardNewKing )
+                if( boardPotential & move.bBoardDst )
                 {
-                    bool bPassThroughCheck = IsCheck( toRankFile );
+                    bool bPassThroughCheck = IsCheck( move.iDstRF );
 
                     if( bPassThroughCheck ) // Can't move into check
                         return false;
 
-                    Move_t move = MakeMove( fromRankFile, toRankFile );
                     DoMove( move );
                     bValid = true;
                 }
             }
+
+        return bValid;
+    }
+
+    bool Capture( const Move_t& move )
+    {
+        bool bValid = false;
+
+        switch( move.iPieceSrc )
+        {
+            case PIECE_PAWN: return CapturePawn( move ); break;
+            case PIECE_ROOK:
+                break;
+            case PIECE_KNIGHT:
+                break;
+            case PIECE_BISHOP:
+                break;
+            case PIECE_QUEEN:
+                break;
+            case PIECE_KING:
+                break;
+            default:
+                printf( "ERROR: Invalid Capture with unknown piece!\n" );
         }
 
         return bValid;
     }
 
-    bool Capture( uint8_t fromRankFile, uint8_t toRankFile )
+    bool CapturePawn( const Move_t& move )
     {
-        bool bValid = true;
-
-(void) fromRankFile;
-(void) toRankFile ;
+        bool bValid = false;
 
         return bValid;
     }
@@ -581,8 +648,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         move.iPlayer = iPlayer;
         move.iEnemy  = iEnemy ;
 
-        move.nSrcRF = fromRankFile;
-        move.nDstRF = toRankFile  ;
+        move.iSrcRF = fromRankFile;
+        move.iDstRF = toRankFile  ;
 
         move.iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
         move.iPieceDst = _player[ iPlayer ].GetPiece( toRankFile   );
@@ -597,8 +664,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     // Remove piece from old location, place piece onto new location
     void DoMove( const Move_t& move )
     {
-        bitboard_t boardOld = BitBoardMakeLocation( move.nSrcRF );
-        bitboard_t boardNew = BitBoardMakeLocation( move.nDstRF );
+        bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
+        bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
 
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] |=  boardNew;
@@ -623,9 +690,9 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
         // if dst square is empty, the IsMove()
         if (move.iEnemyDst == PIECE_EMPTY)
-            bValid = Move( fromRankFile, toRankFile );
+            bValid = Move( move );
         else
-            bValid = Capture( fromRankFile, toRankFile );
+            bValid = Capture( move );
 
         return bValid;
     }
