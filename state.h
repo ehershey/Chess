@@ -508,7 +508,7 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     if( boardAll & boardNewRook)
                         return false;
 
-                    // Verify Player's own rook exists in the right location
+                    // Verify Player's own rook exists in the correct location
                     if( ! (_player[ iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook) )
                         return false;
 
@@ -521,19 +521,11 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
                     // _bFlags |=  STATE_GAME_MID;
 
-//                    Move_t moveKing = MakeMove( fromRankFile     , castle.nNewKingRF );
-//                    Move_t moveRook = MakeMove( castle.nOldRookRF, castle.nNewRookRF );
-//
-//                    DoMove( moveKing );
-//                    DoMove( moveRook );
+                    Move_t moveKing = MakeMove( fromRankFile     , castle.nNewKingRF );
+                    Move_t moveRook = MakeMove( castle.nOldRookRF, castle.nNewRookRF );
 
-                    // Remove old king, old rook
-                    _player[ iPlayer ]._aBoards[ PIECE_KING ] &= ~boardOldKing;
-                    _player[ iPlayer ]._aBoards[ PIECE_ROOK ] &= ~boardOldRook;
-
-                    // Place new king, new rook
-                    _player[ iPlayer ]._aBoards[ PIECE_KING ] |= boardNewKing;
-                    _player[ iPlayer ]._aBoards[ PIECE_ROOK ] |= boardNewRook;
+                    DoMove( moveKing ); // Remove old king, place new king
+                    DoMove( moveRook ); // Remove old rook, place new rook
 
                     bValid = true;
                 }
@@ -548,6 +540,11 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
                 if( boardPotential & boardNewKing )
                 {
+                    bool bPassThroughCheck = IsCheck( toRankFile );
+
+                    if( bPassThroughCheck ) // Can't move into check
+                        return false;
+
                     Move_t move = MakeMove( fromRankFile, toRankFile );
                     DoMove( move );
                     bValid = true;
@@ -588,7 +585,6 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
         move.bBoardSrc = BitBoardMakeLocation( fromRankFile );
         move.bBoardDst = BitBoardMakeLocation( toRankFile   );
-
         return move;
     }
 
@@ -600,6 +596,9 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] |=  boardNew;
+
+        // IsCheckmate()?
+        // IsCheck()?
     }
 
     bool MoveOrCapture( uint8_t fromRankFile, uint8_t toRankFile )
