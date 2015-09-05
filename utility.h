@@ -35,7 +35,7 @@ void CellToColRow( const uint8_t cell, uint8_t& col_, uint8_t& row_ )
 // i -> rf 
 uint8_t CellToRankFile( const int cell )
 {
-    uint8_t col      = cell & 7;
+    uint8_t col      = cell & 7; // %  8
     uint8_t row      = cell / 8; // >> 3
     uint8_t rankfile = (row << 4) + col;
     return  rankfile ;
