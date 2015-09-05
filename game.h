@@ -18,6 +18,11 @@ struct ChessGame_t
         _aMoves[ _nMoves ].Init();
     }
 
+    void Clear()
+    {
+        _aMoves[ _nMoves ].Clear();
+    }
+
     void Edit( int iPlayer, int iPiece, uint8_t nDstRF )
     {
         _aMoves[ _nMoves ].DelPiece( nDstRF );
