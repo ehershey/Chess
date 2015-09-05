@@ -2,6 +2,11 @@ struct StateBitBoard_t
 {
     bitboard_t _aBoards[ NUM_PIECES ];
 
+    void Zero()
+    {
+        memset( _aBoards, 0, sizeof( _aBoards );
+    }
+
     void AddPiece( int iPiece, uint8_t nDstRF )
     {
         bitboard_t& board  = _aBoards[ iPiece ];
@@ -181,6 +186,15 @@ struct State_t
     void Zero()
     {
         memset( this, 0, sizeof( *this ) );
+    }
+
+    void Clear()
+    {
+        pState = &_player[ PLAYER_WHITE ];
+        pState->Zero();
+
+        pState = &_player[ PLAYER_BLACK ];
+        pState->Zero();
     }
 
     void Init()
