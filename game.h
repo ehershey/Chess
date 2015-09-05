@@ -18,6 +18,11 @@ struct ChessGame_t
         _aMoves[ _nMoves ].Init();
     }
 
+    void Edit( int iPlayer, int iPiece, uint8_t nDstRF )
+    {
+        _aMoves[ _nMoves ].AddPiece( iPlayer, iPiece, nDstRF );
+    }
+
     bool MoveOrCapture( uint8_t nSrcRF, uint8_t nDstRF )
     {
         return _aMoves[ _nMoves ].MoveOrCapture( nSrcRF, nDstRF );
