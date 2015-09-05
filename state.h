@@ -4,7 +4,7 @@ struct StateBitBoard_t
 
     void Zero()
     {
-        memset( _aBoards, 0, sizeof( _aBoards );
+        memset( _aBoards, 0, sizeof( _aBoards ) );
     }
 
     void AddPiece( int iPiece, uint8_t nDstRF )
@@ -190,6 +190,8 @@ struct State_t
 
     void Clear()
     {
+        StateBitBoard_t *pState;
+
         pState = &_player[ PLAYER_WHITE ];
         pState->Zero();
 
