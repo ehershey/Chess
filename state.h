@@ -208,7 +208,7 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         _bFlags = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
         _iFrom  = 0;
         _iTo    = 0;
-
+//printf( "State.Flags: %08X\n", _bFlags );
         _bPawnsMoved = 0;
         _iParent     = 0;
         _iFirstChild = 1;
@@ -434,6 +434,8 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         else
         if( iPieceSrc == PIECE_KING )
         {
+//printf( ">Move() State.Flags: %08X\n", _bFlags );
+//printf( ">Move() KING  Castle: %s\n", bCanCastle ? "Yes" : "NO " );
             // Input: e1g1, e1c1, e8g8, e8c8
             if( bCanCastle )
             {
