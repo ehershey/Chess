@@ -83,7 +83,7 @@ int GetInputLocation( char *pText, size_t nLen )
 
     if ((nLen > 1) && (bUpper || bLower) && bNumber)
     {
-        nRF = (((p[0] - 1) & 7) << 4) + ((p[1] - 1) & 7);
+        nRF = (((p[1] - 1) & 7) << 4) + ((p[0] - 1) & 7);
 printf( "RankFile: 0x%02X\n", nRF );
     }
 
