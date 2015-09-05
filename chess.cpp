@@ -227,12 +227,27 @@ int main( const int nArg, const char *aArg[] )
                 bBadCommand = true;
         }
         else
+        if( aLens[0] == 3 )
+        {
+            if( strcmp( aCmds[0], "cls" ) == 0 )
+                game.Clear();
+            else
+                bBadCommand = true;
+        }
+        else
         {
             if( strcmp( aCmds[0], "quit" ) == 0 )
                 bQuit = true;
             else
+            if( strcmp( aCmds[0], "clear") == 0 ) // clear board
+            {
+                game.Clear();
+            }
+            else
             if( strcmp( aCmds[0], "random") == 0 )
-                 ; // ignore xboard command
+            {
+                ; // ignore xboard command
+            }
             else
             if( strcmp( aCmds[0], "new" ) == 0 )
                 game.Init();
