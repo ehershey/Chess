@@ -184,8 +184,8 @@ int main( const int nArg, const char *aArg[] )
                         //iDstPiece = BoardGetPiece( nDsrRF );
                         //bool bDirectCaptures  = // Player x Enemy
                         //bool bIndirectCapture = // pawn: en-passant
-
-                        game.NextTurn();
+                        if( game.MoveOrCapture( nSrcRF, nDstRF ) )
+                            game.NextTurn();
                     }
                     break;
 

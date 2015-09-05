@@ -18,6 +18,11 @@ struct ChessGame_t
         _aMoves[ _nMoves ].Init();
     }
 
+    bool MoveOrCapture( uint8_t nSrcRF, uint8_t nDstRF )
+    {
+        return _aMoves[ _nMoves ].MoveOrCapture( nSrcRF, nDstRF );
+    }
+
     void NextTurn()
     {
         _nMoves++;
