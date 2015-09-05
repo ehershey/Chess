@@ -478,11 +478,10 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                 // King moved, can't castle anymore
                 SetCastledFlags( castle.bWhichSide ); // Optimization, 0=none, else
             } // can castle
-/*
             else
             {
-                bitboard_t boardPotential = BitBoardMakeMovesColorKing( fromRankFile );
-                bitboard_t boardNewKing   = BitBoardMakeLocation      ( toRankFile   );
+                bitboard_t boardPotential = BitBoardMovesColorKing( fromRankFile );
+                bitboard_t boardNewKing   = BitBoardMakeLocation  ( toRankFile   );
 
                 if( boardPotential & boardNewKing )
                 {
@@ -491,16 +490,19 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     bValid = true;
                 }
             }
-*/
         }
 
         return bValid;
     }
 
-    void Capture( uint8_t fromRankFile, uint8_t toRankFile )
+    bool Capture( uint8_t fromRankFile, uint8_t toRankFile )
     {
+        bool bValid = true;
+
 (void) fromRankFile;
 (void) toRankFile ;
+
+        return bValid;
     }
 
     Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
@@ -537,22 +539,27 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] |=  boardNew;
     }
 
-    void MoveOrCapture( uint8_t fromRankFile, uint8_t toRankFile )
+    bool MoveOrCapture( uint8_t fromRankFile, uint8_t toRankFile )
     {
-        Move_t move = MakeMove( fromRankFile, toRankFile );
+        bool   bValid = false;
+        Move_t move   = MakeMove( fromRankFile, toRankFile );
 
         // Move should already be verified:
         // iPieceSrc != PIECE_EMPTY
         // iPieceDst != PIECE_EMPTY
-        if ((move.iPieceDst == PIECE_EMPTY) && (move.iEnemyDst == PIECE_EMPTY))
-            return;
+        if (move.iPieceSrc == PIECE_EMPTY)
+            return bValid;
+
+        if (move.iPieceDst != PIECE_EMPTY)
+            return bValid; // Can't attack same color!
 
         // if dst square is empty, the IsMove()
-        // Exception: If King tries to capture same color rook
-        if ((move.iPieceDst == PIECE_EMPTY) && (move.iEnemyDst == PIECE_EMPTY))
-            Move( fromRankFile, toRankFile );
+        if (move.iEnemyDst == PIECE_EMPTY)
+            bValid = Move( fromRankFile, toRankFile );
         else
-            Capture( fromRankFile, toRankFile );
+            bValid = Capture( fromRankFile, toRankFile );
+
+        return bValid;
     }
 
     float Eval()
