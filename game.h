@@ -20,6 +20,7 @@ struct ChessGame_t
 
     void Edit( int iPlayer, int iPiece, uint8_t nDstRF )
     {
+        _aMoves[ _nMoves ].DelPiece( nDstRF );
         _aMoves[ _nMoves ].AddPiece( iPlayer, iPiece, nDstRF );
     }
 
