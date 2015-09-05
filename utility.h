@@ -13,7 +13,7 @@
       A1 B1 C1 D1 E1 F1 G1 H1
 */
 
-#undef _C2 // Stupid Windows Shit
+#undef _C2 // Fix stupid MSVC shit: yvals.h #define _C2			1	/* 0 if not 2's complement */
 
 enum RankFileNames_e
 {
