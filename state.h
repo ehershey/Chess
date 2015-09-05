@@ -2,6 +2,24 @@ struct StateBitBoard_t
 {
     bitboard_t _aBoards[ NUM_PIECES ];
 
+    void AddPiece( int iPiece, uint8_t nDstRF )
+    {
+        bitboard_t& board  = _aBoards[ iPiece ];
+        bitboard_t  origin = BitBoardMakeLocation( nDstRF );
+        board |= origin;
+    }
+
+    void DelPiece( uint8_t nDstRF )
+    {
+        bitboard_t  origin = BitBoardMakeLocation( nDstRF );
+
+        for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
+        {
+            bitboard_t& board  = _aBoards[ iPiece ];
+            board &= ~origin;
+        }
+    }
+
     void Dump( int iPlayer )
     {
         for( int iPiece = PIECE_PAWN; iPiece < NUM_PIECES; iPiece++ )
@@ -208,6 +226,21 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         {
             StateBitBoard_t *pState = &_player[ iPlayer ];
             pState->Dump( iPlayer );
+        }
+    }
+
+    void AddPiece( int iPlayer, int iPiece, uint8_t nDstRF )
+    {
+        StateBitBoard_t *pState = &_player[ iPlayer ];
+        pState->AddPiece( iPiece, nDstRF );
+    }
+
+    void DelPiece( uint8_t nDstRF )
+    {
+        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
+        {
+            StateBitBoard_t *pState = &_player[ iPlayer ];
+            pState->DelPiece( nDstRF );
         }
     }
 
