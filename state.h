@@ -202,11 +202,8 @@ struct State_t
         pState->Zero();
     }
 
-    void Init()
+    void Reset()
     {
-printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
-printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
-
         // Move
         _bFlags      = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
         _bMoveType   = 0;
@@ -224,6 +221,15 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         _nDepth      = 0;
         _nEval       = 0;
         _nBestMoveRF = INVALID_MOVE_RF;
+    }
+
+    void Init()
+    {
+printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
+printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
+
+        Reset();
+
 //printf( "State.Flags: %08X\n", _bFlags );
 
         StateBitBoard_t *pState;
