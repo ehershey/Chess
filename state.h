@@ -244,16 +244,16 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return board;
     }
 
-    bool IsCheck() // TODO: uint8_t nKingRankFile = 0xFF
+    bool IsCheck( uint8_t nKingRF ) // = 0xFF )
     {
-        uint8_t iPlayer = GetColorPlayer();
         uint8_t iEnemy  = GetColorEnemy ();
 
 //        StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
 //        StateBitBoard_t *pStateThem = &_player[ iEnemy  ];
 
-        bitboard_t origin       = _player[ iPlayer ]._aBoards[ PIECE_KING ];
-        uint8_t    kingRankFile = BitBoardToRankFile( origin );
+        //bitboard_t origin           = _player[ iPlayer ]._aBoards[ PIECE_KING ];
+        //uint8_t    kingRankFile     = BitBoardToRankFile( origin );
+        bitboard_t origin             = BitBoardMakeLocation( nKingRF );
 
         // From the King's location
         // see if any of the enemy's pieces have Line-of-Sight to us
@@ -263,7 +263,6 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         for( int iPiece = PIECE_QUEEN; iPiece > PIECE_PAWN; iPiece-- )
         {
             bitboard_t movesPotential = 0;
-            bitboard_t movesAll       = 0;
             bitboard_t movesValid     = 0;
             bitboard_t piecesEnemy    = _player[ iEnemy ]._aBoards[ iPiece ];
 
@@ -271,15 +270,15 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
             switch( iPiece )
             {
-                case PIECE_QUEEN : movesPotential = BitBoardMovesColorQueen ( kingRankFile ); break;
-                case PIECE_BISHOP: movesPotential = BitBoardMovesColorBishop( kingRankFile ); break;
-                case PIECE_KNIGHT: movesPotential = BitBoardMovesColorKnight( kingRankFile ); break;
-                case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( kingRankFile ); break;
+                case PIECE_QUEEN : movesPotential = BitBoardMovesColorQueen ( nKingRF ); break;
+                case PIECE_BISHOP: movesPotential = BitBoardMovesColorBishop( nKingRF ); break;
+                case PIECE_KNIGHT: movesPotential = BitBoardMovesColorKnight( nKingRF ); break;
+                case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( nKingRF ); break;
                 case PIECE_PAWN  :
                     if( iEnemy == PLAYER_BLACK )
-                        movesPotential = BitBoardMovesWhitePawn( kingRankFile );
+                        movesPotential = BitBoardMovesWhitePawn( nKingRF );
                     else
-                        movesPotential = BitBoardMovesBlackPawn( kingRankFile );
+                        movesPotential = BitBoardMovesBlackPawn( nKingRF );
                     break;
 
                 // Any enemy pieces lay on the potential moves lines?
@@ -291,7 +290,9 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
                     }
                 }
                 else
+                {
                    ; // can't even move to us
+                }
             }
         } // for piece
 
@@ -348,6 +349,12 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
+/*
+    switch( move.iPieceSrc )
+    {
+    }
+*/
+
         if( iPieceSrc == PIECE_ROOK )
         {
             if( iPlayer == PLAYER_WHITE )
@@ -370,32 +377,41 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         else
         if( iPieceSrc == PIECE_KING )
         {
+            // Input: e1g1, e1c1, e8g8, e8c8
             if( bCanCastle )
             {
                 bool bJustCastled = false;
                 if( iPlayer == PLAYER_WHITE )
                 {
-                    if( bCanCastleQ && (fromRankFile == 0x04) && (toRankFile == 0x00) )
+                    if (bCanCastleQ && (fromRankFile == _E1) && (toRankFile == _C1))
                     {
+                        // Verify no other pieces between king and rook
+                        // bool bIsBlocked = !IsLineOfSight( fromRankFile, toRankFile );
+
                         // Verify Player's rook on toRankFile!
-                        if (iPieceDst == PIECE_ROOK)
+                        if (iPieceDst == PIECE_EMPTY)
                         {
-                            // Place King 0x02 C1 -- IsCheck()?
-                            // Place King 0x03 D1 -- IsCheck()?
-                            bool bPassThroughCheck = false;
+                            bool bIsCheckC1 = IsCheck( _C1 );
+                            bool bIsCheckD1 = IsCheck( _D1 );
+                            bool bPassThroughCheck = bIsCheckC1 | bIsCheckD1;
+
                             if( !bPassThroughCheck )
                                 bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
                         }
                     }
 
-                    if( bCanCastleK && (fromRankFile == 0x05) && (toRankFile == 0x07) )
+                    if (bCanCastleK && (fromRankFile == _E1) && (toRankFile == _G1))
                     {
+                        // Verify no other pieces between king and rook
+                        // bool bIsBlocked = !IsLineOfSight( fromRankFile, toRankFile );
+
                         // Verify Player's rook on toRankFile!
-                        if (iPieceDst == PIECE_ROOK)
+                        if (iPieceDst == PIECE_EMPTY)
                         {
-                            // Place King 0x05 F1 -- IsCheck()?
-                            // Place King 0x06 G1 -- IsCheck()?
-                            bool bPassThroughCheck = false;
+                            bool bIsCheckF1 = IsCheck( _F1 );
+                            bool bIsCheckG1 = IsCheck( _G1 );
+                            bool bPassThroughCheck = bIsCheckF1 | bIsCheckG1;
+
                             if( !bPassThroughCheck )
                                 bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
                         }
@@ -404,27 +420,35 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
                 if( iPlayer == PLAYER_BLACK )
                 {
-                    if( bCanCastleQ && (fromRankFile == 0x74) && (toRankFile == 0x70) )
+                    if (bCanCastleQ && (fromRankFile == _E8) && (toRankFile == _C8))
                     {
+                        // Verify no other pieces between king and rook
+                        // bool bIsBlocked = !IsLineOfSight( fromRankFile, toRankFile );
+
                         // Verify Player's rook on toRankFile!
-                        if (iPieceDst == PIECE_ROOK)
+                        if (iPieceDst == PIECE_EMPTY)
                         {
-                            // Place King 0x72 C8 -- IsCheck()?
-                            // Place King 0x73 D8 -- IsCheck()?
-                            bool bPassThroughCheck = false;
+                            bool bIsCheckC8 = IsCheck( _C8 );
+                            bool bIsCheckD8 = IsCheck( _D8 );
+                            bool bPassThroughCheck = bIsCheckC8 | bIsCheckD8;
+
                             if( !bPassThroughCheck )
                                 bJustCastled = SetCastledFlags( MOVE_CASTLED_Q_SIDE );
                         }
                     }
 
-                    if( bCanCastleK && (fromRankFile == 0x75) && (toRankFile == 0x77) )
+                    if (bCanCastleK && (fromRankFile == _E8) && (toRankFile == _G8))
                     {
+                        // Verify no other pieces between king and rook
+                        // bool bIsBlocked = !IsLineOfSight( fromRankFile, toRankFile );
+
                         // Verify Player's rook on toRankFile!
-                        if (iPieceDst == PIECE_ROOK)
+                        if (iPieceDst == PIECE_EMPTY)
                         {
-                            // Place King 0x75 F8 -- IsCheck()?
-                            // Place King 0x76 G8 -- IsCheck()?
-                            bool bPassThroughCheck = false;
+                            bool bIsCheckF8 = IsCheck( _F8 );
+                            bool bIsCheckG8 = IsCheck( _G8 );
+                            bool bPassThroughCheck = bIsCheckF8 | bIsCheckG8;
+
                             if( !bPassThroughCheck )
                                 bJustCastled = SetCastledFlags( MOVE_CASTLED_K_SIDE );
                         }
