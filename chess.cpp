@@ -145,6 +145,9 @@ int main( const int nArg, const char *aArg[] )
     // wait for command
     while( !bQuit )
     {
+        // TODO: Print move
+        //   #. ???
+        //   #. <lastmove> ???
         // if (gbBoardValid)
         /*         */ game.Print( gbAnsiOutput );
         iNextPlayer = game.PlayerToPlayNext();
