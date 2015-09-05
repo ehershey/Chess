@@ -162,14 +162,32 @@ int main( const int nArg, const char *aArg[] )
             switch( aCmds[0][0] )
             {
                 case 'e':
+                    // <Piece>Location
                     printf( "Edit: %s\n", aCmds[1] );
-                    nSrcRF = GetInputLocation( aCmds[1], aLens[1] );
-                    if (nSrcRF == INVALID_LOCATION)
-                        printf( "Error. Invalid location\n" );
-                    else
+
+                    for( int iPiece = 0; iPiece < (int) sizeof( aPIECES ); iPiece++ )
                     {
-                        //iSrcPiece = GetPiece( pParam+4, nLenParam - 4 );
+                        if( aPIECES[ iPiece ] == aCmds[1][0] )
+                            iSrcPiece = iPiece;
                     }
+
+                    iDstPiece = iSrcPiece & 7;
+                    if ((iDstPiece >= PIECE_PAWN ) && (iDstPiece <= PIECE_KING))
+                    {
+                        int color = PLAYER_WHITE;
+                        if( iSrcPiece > NUM_PIECES)
+                            color = PLAYER_BLACK;
+
+                        nDstRF = GetInputLocation( aCmds[1]+1, aLens[1]-1 );
+                        if (nDstRF == INVALID_LOCATION)
+                            printf( "Error. Invalid location\n" );
+                        else
+                        {
+                            game.Edit( color, iDstPiece, nDstRF );
+                        }
+                    }
+                    else
+                            printf( "Error. Invalid piece. Valid: PRNBQKprnbqk\n" );
                     break;
 
                 case 'm':
