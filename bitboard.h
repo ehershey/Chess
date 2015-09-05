@@ -1,20 +1,30 @@
 /*
 
-  63 62 61 60 59 58 57 56   WBWBWBWB
-  55 54 53 52 51 50 49 48   BWBWBWBW
-  47 46 45 44 43 42 41 40   WBWBWBWB
-  39 38 37 36 35 34 33 32   BWBWBWBW
-  31 30 29 28 27 26 25 24   WBWBWBWB
-  23 22 21 20 19 18 17 16   BWBWBWBW
-  15 14 13 12 11 10  9  8   WBWBWBWB
-   7  6  5  4  3  2  1  0   BWBWBWBW
+A Chess board has 64 sauares, with white in the bottom right.
+Using Standard Algrebaic Notation (SAN):
 
-3 Choices for Bitboards: (We use the first one):
+  a8 b8 c8 d8 e8 f8 g8 h8   WBWBWBWB
+  a7 b7 c7 d7 e7 f7 g7 h7   BWBWBWBW
+  a6 b6 c6 d6 e6 f6 g6 h6   WBWBWBWB
+  a5 b5 c5 d5 e5 f5 g5 h5   BWBWBWBW
+  a4 b4 c4 d4 e4 f4 g4 h4   WBWBWBWB
+  a3 b3 c3 d3 e3 f3 g3 h3   BWBWBWBW
+  a2 b2 c2 d2 e2 f2 g2 h2   WBWBWBWB
+  a1 b1 c1 d1 e1 f1 g1 h1   BWBWBWBW
+
+For each piece we will use a 64-bit integer to represent the locations on the board:
+
+bit 6666555555555544444444443333333333222222222211111111110000000000
+    3210987654321098765432109876543210987654321098765432109876543210
+
+How do we map these bits to the 64 squares?
+
+We have 3 Choices for Bitboards on how to lay out the 64-bits. (We use the first one):
 
   File: A..H (Col)
   Rank: 1..8 (Row)
 
-  = iCell =                 = Chess =                 = 0xRankFile =
+  = iCell =                 = SAN =                   = 0xRankFile =
   63 62 61 60 59 58 57 56   a8 b8 c8 d8 e8 f8 g8 h8   70 71 72 73 74 75 76 77
   55 54 53 52 51 50 49 48   a7 b7 c7 d7 e7 f7 g7 h7   60 61 62 63 64 65 66 67
   47 46 45 44 43 42 41 40   a6 b6 c6 d6 e6 f6 g6 h6   50 51 52 53 54 55 56 57
