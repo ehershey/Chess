@@ -252,35 +252,46 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 //        StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
 //        StateBitBoard_t *pStateThem = &_player[ iEnemy  ];
 
-        bitboard_t origin           = _player[ iPlayer ]._aBoards[ PIECE_KING ];
-        uint8_t    kingRankFile     = BitBoardToRankFile( origin );
+        bitboard_t origin       = _player[ iPlayer ]._aBoards[ PIECE_KING ];
+        uint8_t    kingRankFile = BitBoardToRankFile( origin );
 
         // From the King's location
         // see if any of the enemy's pieces have Line-of-Sight to us
 
+        // Broad  Phase: quickly cull out if piece can't even potentially move to king
+        //               if (boardPiece & origin) can potentially see us
         for( int iPiece = PIECE_QUEEN; iPiece > PIECE_PAWN; iPiece-- )
         {
-            bitboard_t movesAll       = 0;
             bitboard_t movesPotential = 0;
+            bitboard_t movesAll       = 0;
             bitboard_t movesValid     = 0;
+            bitboard_t piecesEnemy    = _player[ iEnemy ]._aBoards[ iPiece ];
 
-(void) movesPotential;
 (void) movesValid;
 
             switch( iPiece )
             {
-                case PIECE_QUEEN : movesAll = BitBoardMovesColorQueen ( kingRankFile ); break;
-                case PIECE_BISHOP: movesAll = BitBoardMovesColorBishop( kingRankFile ); break;
-                case PIECE_KNIGHT: movesAll = BitBoardMovesColorKnight( kingRankFile ); break;
-                case PIECE_ROOK  : movesAll = BitBoardMovesColorRook  ( kingRankFile ); break;
+                case PIECE_QUEEN : movesPotential = BitBoardMovesColorQueen ( kingRankFile ); break;
+                case PIECE_BISHOP: movesPotential = BitBoardMovesColorBishop( kingRankFile ); break;
+                case PIECE_KNIGHT: movesPotential = BitBoardMovesColorKnight( kingRankFile ); break;
+                case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( kingRankFile ); break;
                 case PIECE_PAWN  :
                     if( iEnemy == PLAYER_BLACK )
-                        movesAll = BitBoardMovesWhitePawn( kingRankFile );
+                        movesPotential = BitBoardMovesWhitePawn( kingRankFile );
                     else
-                        movesAll = BitBoardMovesBlackPawn( kingRankFile );
+                        movesPotential = BitBoardMovesBlackPawn( kingRankFile );
                     break;
 
-                movesPotential = movesAll & movesPotential;
+                // Any enemy pieces lay on the potential moves lines?
+                if (movesPotential & origin)
+                {
+                    if (piecesEnemy & movesPotential)
+                    {
+                        // Narrow Phase: walk from Enemy to King checking LoS
+                    }
+                }
+                else
+                   ; // can't even move to us
             }
         } // for piece
 
