@@ -6,8 +6,8 @@ enum Pieces_e
     PIECE_BISHOP, // 3
     PIECE_QUEEN , // 4
     PIECE_KING  , // 5
-    NUM_PIECES  ,
-    PIECE_EMPTY=6,// Optimization: switch from very last byte (=7) to save 1 byte in aPIECES; since we need +1 for NULL terminator
+    PIECE_EMPTY ,// Optimization: switch from very last byte (=7) to save 1 byte in aPIECES; since we need +1 for NULL terminator
+    NUM_PIECES  = PIECE_EMPTY,
 };
 
 // 16 chars including the NULL, the '?' is PIECE_NOT_USED=7
