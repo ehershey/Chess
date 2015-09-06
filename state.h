@@ -195,6 +195,19 @@ struct State_t
         }
     }
 
+    // Remove piece from old location, place piece onto new location
+    void DoMove( const Move_t& move )
+    {
+        bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
+        bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
+
+        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
+        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] |=  boardNew;
+
+        // IsCheckmate()?
+        // IsCheck()?
+    }
+
     void Dump()
     {
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
@@ -202,6 +215,13 @@ struct State_t
             StateBitBoard_t *pState = &_player[ iPlayer ];
             pState->Dump( iPlayer );
         }
+    }
+
+    float Eval()
+    {
+        _nEval = 0;
+
+        return _nEval;
     }
 
     void Init()
@@ -263,22 +283,6 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             pState->BitBoardsToRawBoard( iPlayer, &board );
         }
     }
-
-    void PrintCompactBoard( bool bPrintRankFile = true )
-    {
-        RawBoard_t board;
-        _GetRawBoard( board );
-        board.PrintCompact( bPrintRankFile );
-    }
-
-    void PrintPrettyBoard( bool bPrintRankFile = true )
-    {
-        RawBoard_t board;
-        _GetRawBoard( board );
-        board.PrintPretty( bPrintRankFile );
-    }
-
-inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
     bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
     {
@@ -377,6 +381,29 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         // Check Line-of-Sight from source to destination
 
         return bValid;
+    }
+
+    Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
+    {
+        uint8_t iPlayer = GetColorPlayer();
+        uint8_t iEnemy  = GetColorEnemy ();
+
+        Move_t move;
+
+        move.iPlayer = iPlayer;
+        move.iEnemy  = iEnemy ;
+
+        move.iSrcRF = fromRankFile;
+        move.iDstRF = toRankFile  ;
+
+        move.iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
+        move.iPieceDst = _player[ iPlayer ].GetPiece( toRankFile   );
+        move.iEnemySrc = _player[ iEnemy  ].GetPiece( fromRankFile );
+        move.iEnemyDst = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
+
+        move.bBoardSrc = BitBoardMakeLocation( fromRankFile );
+        move.bBoardDst = BitBoardMakeLocation( toRankFile   );
+        return move;
     }
 
     bool Move( const Move_t& move )
@@ -542,6 +569,10 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        // Verify dstRF == PIECE_EMPTY
+
+        DoMove( move );
+
         return bValid;
     }
 
@@ -580,42 +611,6 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return bValid;
     }
 
-    Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
-    {
-        uint8_t iPlayer = GetColorPlayer();
-        uint8_t iEnemy  = GetColorEnemy ();
-
-        Move_t move;
-
-        move.iPlayer = iPlayer;
-        move.iEnemy  = iEnemy ;
-
-        move.iSrcRF = fromRankFile;
-        move.iDstRF = toRankFile  ;
-
-        move.iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
-        move.iPieceDst = _player[ iPlayer ].GetPiece( toRankFile   );
-        move.iEnemySrc = _player[ iEnemy  ].GetPiece( fromRankFile );
-        move.iEnemyDst = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
-
-        move.bBoardSrc = BitBoardMakeLocation( fromRankFile );
-        move.bBoardDst = BitBoardMakeLocation( toRankFile   );
-        return move;
-    }
-
-    // Remove piece from old location, place piece onto new location
-    void DoMove( const Move_t& move )
-    {
-        bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
-        bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
-
-        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
-        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] |=  boardNew;
-
-        // IsCheckmate()?
-        // IsCheck()?
-    }
-
     bool MoveOrCapture( uint8_t fromRankFile, uint8_t toRankFile )
     {
         bool   bValid = false;
@@ -639,11 +634,18 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return bValid;
     }
 
-    float Eval()
+    void PrintCompactBoard( bool bPrintRankFile = true )
     {
-        _nEval = 0;
+        RawBoard_t board;
+        _GetRawBoard( board );
+        board.PrintCompact( bPrintRankFile );
+    }
 
-        return _nEval;
+    void PrintPrettyBoard( bool bPrintRankFile = true )
+    {
+        RawBoard_t board;
+        _GetRawBoard( board );
+        board.PrintPretty( bPrintRankFile );
     }
 
     void Reset()
@@ -667,11 +669,17 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         _nBestMoveRF = INVALID_MOVE_RF;
     }
 
+    void Search()
+    {
+    }
+
     void SetCastledFlags( int bWhichCastleSide )
     {
         _bFlags     &= ~STATE_CAN_CASTLE_MASK;
         _bMoveType  |=  bWhichCastleSide     ;
     }
+
+inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
     void Zero()
     {
