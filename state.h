@@ -101,9 +101,78 @@ struct State_t
     // Unused                   ; // ============  Current depth when searching
     uint8_t         _pad        ; //     112  128
 
-    void Zero()
+    void AddPiece( int iPlayer, int iPiece, uint8_t nDstRF )
     {
-        memset( this, 0, sizeof( *this ) );
+        StateBitBoard_t *pState = &_player[ iPlayer ];
+        pState->AddPiece( iPiece, nDstRF );
+    }
+
+    bool Capture( const Move_t& move )
+    {
+        bool bValid = false;
+
+        switch( move.iPieceSrc )
+        {
+            case PIECE_PAWN  : bValid = CapturePawn  ( move ); break;
+            case PIECE_ROOK  : bValid = CaptureRook  ( move ); break;
+            case PIECE_KNIGHT: bValid = CaptureKnight( move ); break;
+            case PIECE_BISHOP: bValid = CaptureBishop( move ); break;
+            case PIECE_QUEEN : bValid = CaptureQueen ( move ); break;
+            case PIECE_KING  : bValid = CaptureKing  ( move ); break;
+            default:
+                printf( "ERROR: Invalid Capture with unknown piece!\n" );
+        }
+
+        return bValid;
+    }
+
+    bool CaptureBishop( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool CaptureKing( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool CaptureKnight( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool CapturePawn( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool CaptureRook( const Move_t& move )
+    {
+        bool bValid = false;
+
+        // Check if enemy is PLAYER_WHITE
+        // still can castle, Check if iDstRF == A1, then can't castle Q side
+        // still can castle, Check if iDstRF == H1, then can't castle K side
+        // Check if enemy is PLAYER_BLACK
+        // still can castle, Check if iDstRF == A8, then can't castle Q side
+        // still can castle, Check if iDstRF == H8, then can't castle K side
+
+        return bValid;
+    }
+
+    bool CaptureQueen( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
     }
 
     void Clear()
@@ -117,25 +186,22 @@ struct State_t
         pState->Zero();
     }
 
-    void Reset()
+    void DelPiece( uint8_t nDstRF )
     {
-        // Move
-        _bFlags      = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
-        _bMoveType   = 0;
-        _iSrcRF      = 0;
-        _iDstRF      = 0;
-        _bPawnsMoved = 0;
-        _iGamePhase  = 0;
+        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
+        {
+            StateBitBoard_t *pState = &_player[ iPlayer ];
+            pState->DelPiece( nDstRF );
+        }
+    }
 
-        // Children
-        _iParent     = 0;
-        _iFirstChild = 1;
-        _nChildren   = 0;
-
-        // Eval & Search
-        _nDepth      = 0;
-        _nEval       = 0;
-        _nBestMoveRF = INVALID_MOVE_RF;
+    void Dump()
+    {
+        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
+        {
+            StateBitBoard_t *pState = &_player[ iPlayer ];
+            pState->Dump( iPlayer );
+        }
     }
 
     void Init()
@@ -169,28 +235,22 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         pState->_aBoards[ PIECE_KING   ] = BitBoardInitBlackKing  ();
     }
 
-    void Dump()
+    bitboard_t GetAllPieces()
     {
+        bitboard_t board = 0;
+
         for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
-        {
-            StateBitBoard_t *pState = &_player[ iPlayer ];
-            pState->Dump( iPlayer );
-        }
+            board |= GetPlayerAllPieces( iPlayer );
+
+        return board;
     }
 
-    void AddPiece( int iPlayer, int iPiece, uint8_t nDstRF )
-    {
-        StateBitBoard_t *pState = &_player[ iPlayer ];
-        pState->AddPiece( iPiece, nDstRF );
-    }
+inline uint8_t GetColorEnemy () { return ~_bFlags &  STATE_WHICH_PLAYER; }
+inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
-    void DelPiece( uint8_t nDstRF )
+    bitboard_t GetPlayerAllPieces( int iPlayer )
     {
-        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
-        {
-            StateBitBoard_t *pState = &_player[ iPlayer ];
-            pState->DelPiece( nDstRF );
-        }
+        return _player[ iPlayer ].GetBoardAllPieces();
     }
 
     void _GetRawBoard( RawBoard_t& board )
@@ -204,38 +264,21 @@ printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
         }
     }
 
-    void CompactPrintBoard( bool bPrintRankFile = true )
+    void PrintCompactBoard( bool bPrintRankFile = true )
     {
         RawBoard_t board;
         _GetRawBoard( board );
         board.PrintCompact( bPrintRankFile );
     }
 
-    void PrettyPrintBoard( bool bPrintRankFile = true )
+    void PrintPrettyBoard( bool bPrintRankFile = true )
     {
         RawBoard_t board;
         _GetRawBoard( board );
         board.PrintPretty( bPrintRankFile );
     }
 
-inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
-inline uint8_t GetColorEnemy () { return ~_bFlags &  STATE_WHICH_PLAYER; }
 inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
-
-    bitboard_t GetPlayerAllPieces( int iPlayer )
-    {
-        return _player[ iPlayer ].GetBoardAllPieces();
-    }
-
-    bitboard_t GetAllPieces()
-    {
-        bitboard_t board = 0;
-
-        for( int iPlayer = 0; iPlayer < NUM_PLAYERS; iPlayer++ )
-            board |= GetPlayerAllPieces( iPlayer );
-
-        return board;
-    }
 
     bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
     {
@@ -340,6 +383,13 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        // Trivial reject moves
+        if (IsValidMove( move ) )
+        {
+            printf( "ERROR: Invalid potential move\n" );
+            return bValid;
+        }
+
         switch( move.iPieceSrc )
         {
             case PIECE_PAWN  : bValid = MovePawn  ( move ); break;
@@ -358,55 +408,6 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
     bool MoveBishop( const Move_t& move )
     {
         bool bValid = false;
-
-        return bValid;
-    }
-
-    bool MoveKnight( const Move_t& move )
-    {
-        bool bValid = false;
-
-        return bValid;
-    }
-
-    bool MovePawn( const Move_t& move )
-    {
-        bool bValid = false;
-
-        return bValid;
-    }
-
-    bool MoveQueen( const Move_t& move )
-    {
-        bool bValid = false;
-
-        return bValid;
-    }
-
-    bool MoveRook( const Move_t& move )
-    {
-        bool bValid = false;
-
-        int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
-        int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
-        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
-
-            if (move.iPlayerSrc == PLAYER_WHITE)
-            {
-                if( bCanCastleQ && (move.iSrcRF == _A1) )
-                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
-
-                if( bCanCastleK && (move.iSrcRF == _A8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
-            }
-            else // PLAYER_BLACK
-            {
-                if( bCanCastleQ && (move.iSrcRF == _A8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
-
-                if( bCanCastleK && (move.iSrcRF == _H8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
-            }
 
         return bValid;
     }
@@ -530,33 +531,51 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return bValid;
     }
 
-    bool Capture( const Move_t& move )
+    bool MoveKnight( const Move_t& move )
     {
         bool bValid = false;
-
-        switch( move.iPieceSrc )
-        {
-            case PIECE_PAWN: return CapturePawn( move ); break;
-            case PIECE_ROOK:
-                break;
-            case PIECE_KNIGHT:
-                break;
-            case PIECE_BISHOP:
-                break;
-            case PIECE_QUEEN:
-                break;
-            case PIECE_KING:
-                break;
-            default:
-                printf( "ERROR: Invalid Capture with unknown piece!\n" );
-        }
 
         return bValid;
     }
 
-    bool CapturePawn( const Move_t& move )
+    bool MovePawn( const Move_t& move )
     {
         bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MoveQueen( const Move_t& move )
+    {
+        bool bValid = false;
+
+        return bValid;
+    }
+
+    bool MoveRook( const Move_t& move )
+    {
+        bool bValid = false;
+
+        int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
+        int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
+        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
+
+            if (move.iPlayerSrc == PLAYER_WHITE)
+            {
+                if( bCanCastleQ && (move.iSrcRF == _A1) )
+                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+
+                if( bCanCastleK && (move.iSrcRF == _A8) )
+                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+            }
+            else // PLAYER_BLACK
+            {
+                if( bCanCastleQ && (move.iSrcRF == _A8) )
+                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+
+                if( bCanCastleK && (move.iSrcRF == _H8) )
+                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+            }
 
         return bValid;
     }
@@ -627,10 +646,36 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         return _nEval;
     }
 
+    void Reset()
+    {
+        // Move
+        _bFlags      = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
+        _bMoveType   = 0;
+        _iSrcRF      = 0;
+        _iDstRF      = 0;
+        _bPawnsMoved = 0;
+        _iGamePhase  = 0;
+
+        // Children
+        _iParent     = 0;
+        _iFirstChild = 1;
+        _nChildren   = 0;
+
+        // Eval & Search
+        _nDepth      = 0;
+        _nEval       = 0;
+        _nBestMoveRF = INVALID_MOVE_RF;
+    }
+
     void SetCastledFlags( int bWhichCastleSide )
     {
         _bFlags     &= ~STATE_CAN_CASTLE_MASK;
         _bMoveType  |=  bWhichCastleSide     ;
+    }
+
+    void Zero()
+    {
+        memset( this, 0, sizeof( *this ) );
     }
 };
 

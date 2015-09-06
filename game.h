@@ -58,12 +58,12 @@ struct ChessGame_t
 
     void PrintBoardCompact()
     {
-        _aMoves[ _nMoves ].CompactPrintBoard();
+        _aMoves[ _nMoves ].PrintCompactBoard();
     }
 
     void PrintBoardPretty()
     {
-        _aMoves[ _nMoves ].PrettyPrintBoard();
+        _aMoves[ _nMoves ].PrintPrettyBoard();
     }
 };
 
