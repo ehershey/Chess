@@ -383,6 +383,14 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         return false; // FIXME:
     }
 
+    bool IsCheckPassInto( const Move_t& move )
+    {
+        bool bIsCheck = false;
+
+        return bIsCheck;
+    }
+
+
     // Test trivial potential moves
     bool IsValidMove( const Move_t& move )
     {
@@ -422,6 +430,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
         bValid = bBoardPotential & move.bBoardDst ? 1 : 0;
 
+        // FIXME: Test if Check if move was succcessfull
+        if( IsCheckPassInto( move ) )
+            return bValid;
+
+        bValid = true;
         // If dest is same color as player mark invalid
         // If new state IsCheck() not a valid move
         // If dest is enemy color
@@ -489,6 +502,10 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        if( IsCheckPassInto( move ) )
+            return bValid;
+
+        bValid = true;
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
@@ -623,8 +640,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        bool bPassIntoCheck = false;
-        if ( bPassIntoCheck )
+        if( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
@@ -640,8 +656,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        bool bPassIntoCheck = false;
-        if ( bPassIntoCheck )
+        if( IsCheckPassInto( move ) )
             return bValid;
 
         // if move.iEnemyDst == PIECE_EMPTY already done in MoveOrCapture()
@@ -672,8 +687,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
-        bool bPassIntoCheck = false;
-        if ( bPassIntoCheck )
+        if( IsCheckPassInto( move ) )
             return bValid;
 
         if (move.iPlayerSrc == PLAYER_WHITE)
@@ -706,8 +720,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        bool bPassIntoCheck = false;
-        if ( bPassIntoCheck )
+        if( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
