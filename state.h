@@ -747,16 +747,16 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         bool   bValid = false;
         Move_t move   = MakeMove( fromRankFile, toRankFile );
 
-        // Move should already be verified:
-        // iPieceSrc != PIECE_EMPTY
-        // iPieceDst != PIECE_EMPTY
+        if( fromRankFile == toRankFile )
+            return bValid;
+
         if (move.iPieceSrc == PIECE_EMPTY)
             return bValid;
 
         if (move.iPieceDst != PIECE_EMPTY)
             return bValid; // Can't attack same color!
 
-        // if dst square is empty, the IsMove()
+        // if dst square is empty, then have move, else capture
         if (move.iEnemyDst == PIECE_EMPTY)
             bValid = Move( move );
         else
