@@ -94,10 +94,10 @@ struct State_t
     uint16_t        _iFirstChild   ; // +2  106  122  i-node of first child
     uint8_t         _nChildren     ; // +1  107  123  total children
     // Eval & Search               ;
-    uint8_t         _nDepth        ; // +1  108  124
+    uint8_t         _nDepth        ; // +1  108  124  Current depth when searching
      int16_t        _nEval         ; // +2  110  126
     uint8_t         _nBestMoveRF   ; // +1  111  127
-    // Unused                      ; // ============  Current depth when searching
+    // Meta Meta                   ; // ============
     uint8_t         _iGamePhase    ; //     112  128  0x00=early game, 0x80=mid-game, 0xFF=end-game
 
     void AddPiece( int iPlayer, int iPiece, uint8_t nDstRF )
