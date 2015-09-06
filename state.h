@@ -411,7 +411,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         bool bValid = false;
 
         // Trivial reject moves
-        if (IsValidMove( move ) )
+        if ( !IsValidMove( move ) )
         {
             printf( "ERROR: Invalid potential move\n" );
             return bValid;
