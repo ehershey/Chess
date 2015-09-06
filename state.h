@@ -19,8 +19,8 @@ struct Move_t
     uint8_t    iPlayerDst; // which player
 
     // Piece
-    uint8_t    iPieceSrc ; // 8*iPlayerColor
-    uint8_t    iPieceDst ; // 8*iPlayerColor
+    uint8_t    iPieceSrc ; // (ColorPieces_e) // 8*iPlayerColor
+    uint8_t    iPieceDst ; // (ColorPieces_e) // 8*iPlayerColor
 //  uint8_t    iEnemySrc ;
 //  uint8_t    iEnemyDst ;
 
