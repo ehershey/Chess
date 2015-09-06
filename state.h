@@ -9,7 +9,7 @@ struct Castle_t
 struct Move_t
 {
     uint8_t    iPlayer   ;
-    uint8_t    iEnemy    ;
+//  uint8_t    iEnemy    ; // OptimizatioN: iPlayer^1
 
     // Location
     uint8_t    iSrcRF    ;
@@ -225,10 +225,10 @@ struct State_t
         bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
         bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
 
-        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
-        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardNew;
+        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
+        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc ] &= ~boardNew;
 
-        _player[ move.iEnemy  ]._aBoards[ move.iPieceDst ] &= ~boardNew;
+        _player[ move.iPlayer^1 ]._aBoards[ move.iPieceDst ] &= ~boardNew;
 
         // IsCheckmate()?
         // IsCheck()?
@@ -460,7 +460,6 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         Move_t move;
 
         move.iPlayer = iPlayer;
-        move.iEnemy  = iEnemy ;
 
         move.iSrcRF = fromRankFile;
         move.iDstRF = toRankFile  ;
