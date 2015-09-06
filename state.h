@@ -46,10 +46,10 @@ enum StateFlags_e
 {
      STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black // Optimization: Could encode in _bMoveType, and use 4-bit of Piece type
     ,STATE_CHECK             = (1 << 1)
-//    ,STATE_CHECKMATE         = (1 << 2)
-//    ,STATE_STALEMATE         = (1 << 3)
-    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 3)
-    ,STATE_CAN_CASTLE_K_SIDE = (1 << 4)
+    ,STATE_CHECKMATE         = (1 << 2)
+    ,STATE_STALEMATE         = (1 << 3)
+    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4) // TODO: do we need same shift as STATE_CAN_CASTLE_Q_SIDE == MOVE_CASTLED_Q_SIDE ?
+    ,STATE_CAN_CASTLE_K_SIDE = (1 << 5) // TODO: do we need same shift as STATE_CAN_CASTLE_K_SIDE == MOVE_CASTLED_K_SIDE ?
 
     ,STATE_CAN_CASTLE_MASK   = STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE
 };
@@ -198,6 +198,9 @@ struct State_t
     // Remove piece from old location, place piece onto new location
     void DoMove( const Move_t& move )
     {
+        _iSrcRF = move.iSrcRF;
+        _iDstRF = move.iDstRF;
+
         bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
         bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
 
@@ -429,6 +432,9 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                 printf( "ERROR: Invalid Move with unknown piece!\n" );
         }
 
+        _bMoveType &= ~MOVE_PIECE_MASK;
+        _bMoveType |=  move.iPieceSrc;
+
         return bValid;
     }
 
@@ -567,11 +573,22 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
     bool MovePawn( const Move_t& move )
     {
-        bool bValid = false;
+        bool bValid = true;
 
-        // Verify dstRF == PIECE_EMPTY
-
+        // if move.iEnemyDst == PIECE_EMPTY already done in MoveOrCapture()
         DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+
+        int iSrcRank = move.iSrcRF >> 4;
+        int iDstRank = move.iDstRF >> 4;
+        int iSrcFile = move.iSrcRF &  7;
+
+        int nDistance = (iDstRank - iSrcRank);
+        if ((nDistance == 2) || (nDistance == -2))
+            _bMoveType |= MOVE_PAWN_DOUBLE;
+
+        _bPawnsMoved |= (1 << iSrcFile);
 
         return bValid;
     }
@@ -673,10 +690,16 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
     }
 
+    /**
+        @param bWhichCastleSide
+            0 = none
+            MOVE_CASTLED_Q_SIDE
+            MOVE_CASTLED_K_SIDE
+    */
     void SetCastledFlags( int bWhichCastleSide )
     {
         _bFlags     &= ~STATE_CAN_CASTLE_MASK;
-        _bMoveType  |=  bWhichCastleSide     ;
+        _bMoveType  |= bWhichCastleSide      ;
     }
 
 inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
@@ -686,4 +709,3 @@ inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
         memset( this, 0, sizeof( *this ) );
     }
 };
-
