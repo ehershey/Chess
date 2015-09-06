@@ -623,6 +623,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        bool bPassIntoCheck = false;
+        if ( bPassIntoCheck )
+            return bValid;
+
+        bValid = true;
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
@@ -633,9 +638,14 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
     bool MovePawn( const Move_t& move )
     {
-        bool bValid = true;
+        bool bValid = false;
+
+        bool bPassIntoCheck = false;
+        if ( bPassIntoCheck )
+            return bValid;
 
         // if move.iEnemyDst == PIECE_EMPTY already done in MoveOrCapture()
+        bValid = true;
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
@@ -662,6 +672,10 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
+        bool bPassIntoCheck = false;
+        if ( bPassIntoCheck )
+            return bValid;
+
         if (move.iPlayerSrc == PLAYER_WHITE)
         {
             if( bCanCastleQ && (move.iSrcRF == _A1) )
@@ -679,6 +693,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                 _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
         }
 
+        bValid = true;
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
@@ -691,6 +706,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        bool bPassIntoCheck = false;
+        if ( bPassIntoCheck )
+            return bValid;
+
+        bValid = true;
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
