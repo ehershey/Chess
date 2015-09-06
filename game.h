@@ -31,13 +31,13 @@ struct ChessGame_t
 
     bool MoveOrCapture( uint8_t nSrcRF, uint8_t nDstRF )
     {
-        return _aMoves[ _nMoves ].MoveOrCapture( nSrcRF, nDstRF );
+        _aMoves[ _nMoves+1 ] = _aMoves[ _nMoves ];
+        return _aMoves[ _nMoves+1 ].MoveOrCapture( nSrcRF, nDstRF );
     }
 
     void NextTurn()
     {
         _nMoves++;
-        _aMoves[ _nMoves ] = _aMoves[ _nMoves-1 ];
         _aMoves[ _nMoves ].TogglePlayer();
 //printf( "Moves[].Flags: %02X\n", _aMoves[ _nMoves]._bFlags );
     }
