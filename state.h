@@ -326,17 +326,21 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         }
     }
 
+    /**
+        @param nKingRF
+            0xRankFile      - Use specified king position
+            INVALID_MOVE_RF - Use current king position
+    */
     bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
     {
+        uint8_t iPlayer     = GetColorPlayer();
         uint8_t iEnemy      = GetColorEnemy ();
         uint8_t bPawnsMoved = _bPawnsMoved[ iEnemy ];
 
-//        StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
-//        StateBitBoard_t *pStateThem = &_player[ iEnemy  ];
-
-        //bitboard_t origin           = _player[ iPlayer ]._aBoards[ PIECE_KING ];
-        //uint8_t    kingRankFile     = BitBoardToRankFile( origin );
-        bitboard_t origin             = BitBoardMakeLocation( nKingRF );
+        bitboard_t origin = (nKingRF == INVALID_MOVE_RF)
+            ? _player[ iPlayer ]._aBoards[ PIECE_KING ]
+            : BitBoardMakeLocation( nKingRF )
+            ;
 
         // From the King's location
         // see if any of the enemy's pieces have Line-of-Sight to us
@@ -354,7 +358,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             switch( iPiece )
             {
                 case PIECE_PAWN  :
-// TODO: FIXME: Replace with BitBoardAttacksWhitePawn( nKingRF )
+// TODO: FIXME: Replace with BitBoardAttacksWhitePawn( nKingRF, bPawnsMoved )
                     if (iEnemy == PLAYER_WHITE)
                         movesPotential = BitBoardMovesWhitePawn( nKingRF, bPawnsMoved );
                     else
@@ -386,6 +390,12 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     bool IsCheckPassInto( const Move_t& move )
     {
         bool bIsCheck = false;
+
+        State_t nextState = *this;
+
+        nextState.DoMove( move );
+        if ( nextState.IsCheck( INVALID_MOVE_RF ) )
+            bIsCheck = true;
 
         return bIsCheck;
     }
