@@ -326,7 +326,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             0xRankFile      - Use specified king position
             INVALID_MOVE_RF - Use current king position
     */
-    bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
+    bool IsCheck( uint8_t nKingRF, bool bCheckForMate = true ) // = INVALID_MOVE_RF
     {
         bool    bIsCheck    = false;
         uint8_t iPlayer     = GetColorPlayer();
@@ -380,12 +380,20 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             }
         } // for piece
 
-        if( bIsCheck )
+        // IsCheckmate()
+        if (bIsCheck && bCheckForMate)
         {
             uint8_t nMoves;
             uint8_t aMoves[ MAX_PIECE_MOVES ];
             BitBoardToRankFileAllMoves( origin, nMoves, aMoves, MAX_PIECE_MOVES );
-            // IsCheckmate()?
+
+            for( uint8_t iMove = 0; iMove < nMoves; iMove++ )
+            {
+                if (!IsCheck( aMoves[ iMove ], false ))
+                    return bIsCheck; // Have at least one valid move, not checkmate
+            }
+
+            _bFlags |= STATE_CHECKMATE;
         }
 
         return bIsCheck;
