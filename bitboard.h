@@ -312,7 +312,7 @@ bitboard_t BitBoardMovesBlackPawn( uint8_t rankfile, uint8_t bHasMoved = 0x00 )
     if (~bHasMoved & (1 << col)) // can move 2 tiles if haven't moved
         board |= (board >> 8); // Optimization: Don't need: & rank8
 
-    return board & ~origin;
+    return board;
 }
 
 
@@ -326,7 +326,7 @@ bitboard_t BitBoardMovesWhitePawn( uint8_t rankfile, uint8_t bHasMoved = 0x00 )
     if (~bHasMoved & (1 << col)) // can move 2 tiles if haven't moved
         board |= (board << 8);
 
-    return board & ~origin;
+    return board;
 }
 
 
