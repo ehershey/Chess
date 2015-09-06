@@ -226,7 +226,7 @@ struct State_t
         bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
 
         _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] &= ~boardOld;
-        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] &= ~boardNew;
+        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] |=  boardNew;
 
         _player[ move.iPlayer^1 ]._aBoards[ move.iPieceDst & PIECE_MASK ] &= ~boardNew;
 
