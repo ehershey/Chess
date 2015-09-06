@@ -95,6 +95,7 @@ copy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)..\..\bin\"
     <ClInclude Include="..\rawboard.h" />
     <ClInclude Include="..\search.h" />
     <ClInclude Include="..\state.h" />
+    <ClInclude Include="..\state_bitboard.h" />
     <ClInclude Include="..\utility.h" />
   </ItemGroup>
   <ItemGroup>
