@@ -19,10 +19,10 @@ struct Move_t
     uint8_t    iPlayerDst; // which player
 
     // Piece
-    uint8_t    iPieceSrc ;
-    uint8_t    iPieceDst ;
-    uint8_t    iEnemySrc ;
-    uint8_t    iEnemyDst ;
+    uint8_t    iPieceSrc ; // 8*iPlayerColor
+    uint8_t    iPieceDst ; // 8*iPlayerColor
+//  uint8_t    iEnemySrc ;
+//  uint8_t    iEnemyDst ;
 
     // Board Location Mask
     bitboard_t bBoardSrc;
@@ -454,23 +454,35 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
     Move_t MakeMove( uint8_t fromRankFile, uint8_t toRankFile )
     {
-        uint8_t iPlayer = GetColorPlayer();
-        uint8_t iEnemy  = GetColorEnemy ();
-
         Move_t move;
 
-        move.iPlayer = iPlayer;
+        move.iPlayer = GetColorPlayer();
 
         move.iSrcRF = fromRankFile;
         move.iDstRF = toRankFile  ;
 
-        move.iPieceSrc = _player[ iPlayer ].GetPiece( fromRankFile );
-        move.iPieceDst = _player[ iPlayer ].GetPiece( toRankFile   );
-        move.iEnemySrc = _player[ iEnemy  ].GetPiece( fromRankFile );
-        move.iEnemyDst = _player[ iEnemy  ].GetPiece( toRankFile   ); // check for capture
-
         move.bBoardSrc = BitBoardMakeLocation( fromRankFile );
         move.bBoardDst = BitBoardMakeLocation( toRankFile   );
+
+        bitboard_t aBoardPieces[ NUM_PLAYERS ];
+        /*      */ aBoardPieces[ PLAYER_WHITE ] = _player[ PLAYER_WHITE ].GetBoardAllPieces();
+        /*      */ aBoardPieces[ PLAYER_BLACK ] = _player[ PLAYER_BLACK ].GetBoardAllPieces();
+
+        move.iPlayerSrc = move.iPlayer;
+        move.iPlayerDst = move.iPlayer;
+
+        for( int iPlayer = PLAYER_WHITE; iPlayer < NUM_PLAYERS; iPlayer++ )
+        {
+            if (aBoardPieces[ iPlayer ] & move.bBoardSrc)
+                move.iPlayerSrc = iPlayer;
+
+            if (aBoardPieces[ iPlayer ] & move.bBoardDst)
+                move.iPlayerDst = iPlayer;
+        }
+
+        move.iPieceSrc = _player[ move.iPlayerSrc ].GetPiece( fromRankFile ) + (8 * move.iPlayerSrc);
+        move.iPieceDst = _player[ move.iPlayerDst ].GetPiece( toRankFile   ) + (8 * move.iPlayerDst);
+
         return move;
     }
 
@@ -747,18 +759,19 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         if (fromRankFile == toRankFile)
             return bValid;
 
-        if (move.iPieceSrc == PIECE_EMPTY)
+        if ((move.iPieceSrc  & PIECE_MASK) == PIECE_EMPTY)
             return bValid;
 
-        if (move.iPieceDst != PIECE_EMPTY)
-            return bValid; // Can't attack same color!
-
         // if dst square is empty, then have move, else capture
-        if (move.iEnemyDst == PIECE_EMPTY)
+        if ((move.iPieceDst & PIECE_MASK) == PIECE_EMPTY)
             bValid = Move( move );
         else
-            bValid = Capture( move );
+        {
+            if (move.iPlayerSrc == move.iPlayerDst)
+                return bValid; // Can't attack same color!
 
+             bValid = Capture( move );
+        }
         return bValid;
     }
 
