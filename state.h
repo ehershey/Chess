@@ -435,7 +435,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         bool       bValid          = false;
         uint8_t    bPawnsMoved     = _bPawnsMoved[ move.iPlayer ];
         bitboard_t bBoardPotential = 0; // potential moves
-        bitboard_t bBoardCastle    = move.bBoardDst;
+        bitboard_t bBoardDst       = move.bBoardDst;
 
         // If dest is same color as player mark invalid
         // If new state IsCheck() not a valid move
@@ -458,20 +458,16 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             case WHITE_QUEEN :
             case BLACK_QUEEN : bBoardPotential = BitBoardMovesColorQueen ( move.iSrcRF ); break;
             case WHITE_KING  : bBoardPotential = BitBoardMovesColorKing  ( move.iSrcRF );
-                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C1 );
-                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardCastle |= BitBoardMakeLocation( _G1 );
-                bValid = bBoardPotential & bBoardCastle ? 1 : 0;
-                return bValid;
+                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardDst |= BitBoardMakeLocation( _C1 );
+                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardDst |= BitBoardMakeLocation( _G1 );
                 break;
             case BLACK_KING  : bBoardPotential = BitBoardMovesColorKing  ( move.iSrcRF );
-                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C8 );
-                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardCastle |= BitBoardMakeLocation( _G8 );
-                bValid = bBoardPotential & bBoardCastle ? 1 : 0;
-                return bValid;
+                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardDst |= BitBoardMakeLocation( _C8 );
+                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardDst |= BitBoardMakeLocation( _G8 );
                 break;
         }
 
-        bValid = bBoardPotential & move.bBoardDst ? 1 : 0;
+        bValid = (bBoardPotential & bBoardDst) ? 1 : 0;
 
         if ( IsCheckPassInto( move ) )
             return bValid;
