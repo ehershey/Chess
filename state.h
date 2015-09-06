@@ -440,8 +440,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
         bValid = bBoardPotential & move.bBoardDst ? 1 : 0;
 
-        // FIXME: Test if Check if move was succcessfull
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
@@ -512,7 +511,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
@@ -535,7 +534,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 //printf( ">Move() State.Flags: %08X\n", _bFlags );
 //printf( ">Move() KING  Castle: %s\n", bCanCastle ? "Yes" : "NO " );
             // Input: e1g1, e1c1, e8g8, e8c8
-            if( bCanCastle )
+            if ( bCanCastle )
             {
                 Castle_t castle;
                 castle.bWhichSide = 0;
@@ -584,7 +583,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                     }
                 }
 
-                if( castle.bWhichSide ) // Attempt to castle?
+                if ( castle.bWhichSide ) // Attempt to castle?
                 {
                     // Verify no other pieces between king and rook
                     bitboard_t boardAll     = GetAllPieces();
@@ -596,18 +595,17 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                     if (boardAll & boardNewKing) // if (iPieceDst == PIECE_EMPTY)
                         return false;
 
-                    if( boardAll & boardNewRook)
+                    if (boardAll & boardNewRook)
                         return false;
 
                     // Verify Player's own rook exists in the correct location
-                    if( ! (_player[ move.iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook) )
+                    if (! (_player[ move.iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook))
                         return false;
 
                     bool bIsCheck0         = IsCheck( castle.nNewKingRF ); // FIXME: Verify enemy
                     bool bIsCheck1         = IsCheck( castle.nNewRookRF );
                     bool bPassThroughCheck = bIsCheck0 | bIsCheck1;
-
-                    if( bPassThroughCheck )
+                    if ( bPassThroughCheck )
                         return false;
 
                     // _bFlags |=  STATE_GAME_MID;
@@ -628,7 +626,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             {
                 bitboard_t boardPotential = BitBoardMovesColorKing( move.iSrcRF );
 
-                if( boardPotential & move.bBoardDst )
+                if ( boardPotential & move.bBoardDst )
                 {
                     bool bPassIntoCheck = IsCheck( move.iDstRF );
                     if ( bPassIntoCheck ) // Can't move into check
@@ -650,7 +648,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
@@ -666,7 +664,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         // if move.iEnemyDst == PIECE_EMPTY already done in MoveOrCapture()
@@ -697,23 +695,23 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         if (move.iPlayerSrc == PLAYER_WHITE)
         {
-            if( bCanCastleQ && (move.iSrcRF == _A1) )
+            if (bCanCastleQ && (move.iSrcRF == _A1))
                 _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-            if( bCanCastleK && (move.iSrcRF == _A8) )
+            if (bCanCastleK && (move.iSrcRF == _A8))
                 _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
         }
         else // PLAYER_BLACK
         {
-            if( bCanCastleQ && (move.iSrcRF == _A8) )
+            if (bCanCastleQ && (move.iSrcRF == _A8))
                 _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-            if( bCanCastleK && (move.iSrcRF == _H8) )
+            if (bCanCastleK && (move.iSrcRF == _H8))
                 _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
         }
 
@@ -730,7 +728,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        if( IsCheckPassInto( move ) )
+        if ( IsCheckPassInto( move ) )
             return bValid;
 
         bValid = true;
@@ -747,7 +745,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         bool   bValid = false;
         Move_t move   = MakeMove( fromRankFile, toRankFile );
 
-        if( fromRankFile == toRankFile )
+        if (fromRankFile == toRankFile)
             return bValid;
 
         if (move.iPieceSrc == PIECE_EMPTY)
