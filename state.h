@@ -83,23 +83,22 @@ enum MoveFlags_e
 struct State_t
 {
     StateBitBoard_t _player[ NUM_PLAYERS ]; // 96 bytes if not storing board[ PIECE_EMPTY ]
-    // Move                     ; //      96  112 bytes
-    uint8_t         _bFlags     ; // +1   97  113
-    uint8_t         _bMoveType  ; // +1   98  114  4-bites: Piece move 4-bits: Type of move or capture
-    uint8_t         _iSrcRF     ; // +1   99  115  From RankFile (0xROWCOL)
-    uint8_t         _iDstRF     ; // +1  100  116  Unto RankFile (0xROWCOL)
-    uint8_t         _bPawnsMoved; // +1  101  117  8-bits: Bitflags if pawn[col] has moved
-    uint8_t         _iGamePhase ; // +1  102  118  0x00=early game, 0x80=mid-game, 0xFF=end-game
-    // Children                 ;
-    uint16_t        _iParent    ; // +2  104  120  i-node of parent
-    uint16_t        _iFirstChild; // +2  106  122  i-node of first child
-    uint8_t         _nChildren  ; // +1  107  123  total children
-    // Eval & Search            ;
-    uint8_t         _nDepth     ; // +1  108  124
-     int16_t        _nEval      ; // +2  110  126
-    uint8_t         _nBestMoveRF; // +1  111  127
-    // Unused                   ; // ============  Current depth when searching
-    uint8_t         _pad        ; //     112  128
+    // Move                        ; //      96  112 bytes
+    uint8_t         _bFlags        ; // +1   97  113
+    uint8_t         _bMoveType     ; // +1   98  114  4-bites: Piece move 4-bits: Type of move or capture
+    uint8_t         _iSrcRF        ; // +1   99  115  From RankFile (0xROWCOL)
+    uint8_t         _iDstRF        ; // +1  100  116  Unto RankFile (0xROWCOL)
+    uint8_t         _bPawnsMoved[2]; // +2  102  118  8-bits: Bitflags if pawn[col] has moved
+    // Children                    ;
+    uint16_t        _iParent       ; // +2  104  120  i-node of parent
+    uint16_t        _iFirstChild   ; // +2  106  122  i-node of first child
+    uint8_t         _nChildren     ; // +1  107  123  total children
+    // Eval & Search               ;
+    uint8_t         _nDepth        ; // +1  108  124
+     int16_t        _nEval         ; // +2  110  126
+    uint8_t         _nBestMoveRF   ; // +1  111  127
+    // Unused                      ; // ============  Current depth when searching
+    uint8_t         _iGamePhase    ; //     112  128  0x00=early game, 0x80=mid-game, 0xFF=end-game
 
     void AddPiece( int iPlayer, int iPiece, uint8_t nDstRF )
     {
@@ -289,7 +288,8 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
     bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
     {
-        uint8_t iEnemy  = GetColorEnemy ();
+        uint8_t iEnemy      = GetColorEnemy ();
+        uint8_t bPawnsMoved = _bPawnsMoved[ iEnemy ];
 
 //        StateBitBoard_t *pStateUs   = &_player[ iPlayer ];
 //        StateBitBoard_t *pStateThem = &_player[ iEnemy  ];
@@ -313,16 +313,17 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
             switch( iPiece )
             {
-                case PIECE_QUEEN : movesPotential = BitBoardMovesColorQueen ( nKingRF ); break;
-                case PIECE_BISHOP: movesPotential = BitBoardMovesColorBishop( nKingRF ); break;
-                case PIECE_KNIGHT: movesPotential = BitBoardMovesColorKnight( nKingRF ); break;
-                case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( nKingRF ); break;
                 case PIECE_PAWN  :
-                    if( iEnemy == PLAYER_BLACK )
-                        movesPotential = BitBoardMovesBlackPawn( nKingRF, _bPawnsMoved );
+// TODO: FIXME: Replace with BitBoardAttacksWhitePawn( nKingRF )
+                    if (iEnemy == PLAYER_WHITE)
+                        movesPotential = BitBoardMovesWhitePawn( nKingRF, bPawnsMoved );
                     else
-                        movesPotential = BitBoardMovesWhitePawn( nKingRF, _bPawnsMoved );
+                        movesPotential = BitBoardMovesBlackPawn( nKingRF, bPawnsMoved );
                     break;
+                case PIECE_ROOK  : movesPotential = BitBoardMovesColorRook  ( nKingRF ); break;
+                case PIECE_KNIGHT: movesPotential = BitBoardMovesColorKnight( nKingRF ); break;
+                case PIECE_BISHOP: movesPotential = BitBoardMovesColorBishop( nKingRF ); break;
+                case PIECE_QUEEN : movesPotential = BitBoardMovesColorQueen ( nKingRF ); break;
 
                 // Any enemy pieces lay on the potential moves lines?
                 if (movesPotential & origin)
@@ -345,7 +346,8 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     // Test trivial potential moves
     bool IsValidMove( const Move_t& move )
     {
-        bool bValid = false;
+        bool    bValid      = false;
+        uint8_t bPawnsMoved = _bPawnsMoved[ move.iPlayer ];
 
         if (move.iPieceSrc == PIECE_EMPTY)
             return bValid;
@@ -354,9 +356,9 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         {
             case PIECE_PAWN  :
                 if (move.iPlayer == PLAYER_WHITE)
-                    bValid = BitBoardMovesWhitePawn( move.iSrcRF, _bPawnsMoved ) & move.bBoardDst ? 1:0 ;
+                    bValid = BitBoardMovesWhitePawn( move.iSrcRF, bPawnsMoved ) & move.bBoardDst ? 1:0 ;
                 else
-                    bValid = BitBoardMovesBlackPawn( move.iSrcRF, _bPawnsMoved ) & move.bBoardDst ? 1:0 ;
+                    bValid = BitBoardMovesBlackPawn( move.iSrcRF, bPawnsMoved ) & move.bBoardDst ? 1:0 ;
                 break;
             case PIECE_ROOK  : bValid = BitBoardMovesColorRook  ( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
             case PIECE_KNIGHT: bValid = BitBoardMovesColorKnight( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
@@ -588,7 +590,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         if ((nDistance == 2) || (nDistance == -2))
             _bMoveType |= MOVE_PAWN_DOUBLE;
 
-        _bPawnsMoved |= (1 << iSrcFile);
+        _bPawnsMoved[ move.iPlayer ] |= (1 << iSrcFile);
 
         return bValid;
     }
@@ -668,12 +670,12 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     void Reset()
     {
         // Move
-        _bFlags      = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
-        _bMoveType   = 0;
-        _iSrcRF      = 0;
-        _iDstRF      = 0;
-        _bPawnsMoved = 0;
-        _iGamePhase  = 0;
+        _bFlags         = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
+        _bMoveType      = 0;
+        _iSrcRF         = 0;
+        _iDstRF         = 0;
+        _bPawnsMoved[0] = 0;
+        _bPawnsMoved[1] = 0;
 
         // Children
         _iParent     = 0;
@@ -684,6 +686,8 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         _nDepth      = 0;
         _nEval       = 0;
         _nBestMoveRF = INVALID_MOVE_RF;
+
+        _iGamePhase  = 0;
     }
 
     void Search()
