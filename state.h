@@ -346,26 +346,25 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     // Test trivial potential moves
     bool IsValidMove( const Move_t& move )
     {
-        bool    bValid      = false;
-        uint8_t bPawnsMoved = _bPawnsMoved[ move.iPlayer ];
+        bool       bValid          = false;
+        uint8_t    bPawnsMoved     = _bPawnsMoved[ move.iPlayer ];
+        bitboard_t bBoardPotential = 0; // potential moves
 
         if (move.iPieceSrc == PIECE_EMPTY)
             return bValid;
 
         switch( move.iPieceSrc )
         {
-            case PIECE_PAWN  :
-                if (move.iPlayer == PLAYER_WHITE)
-                    bValid = BitBoardMovesWhitePawn( move.iSrcRF, bPawnsMoved ) & move.bBoardDst ? 1:0 ;
-                else
-                    bValid = BitBoardMovesBlackPawn( move.iSrcRF, bPawnsMoved ) & move.bBoardDst ? 1:0 ;
+            case PIECE_PAWN  : if (move.iPlayer == PLAYER_WHITE)
+                               bBoardPotential = BitBoardMovesWhitePawn( move.iSrcRF, bPawnsMoved );
+                else           bBoardPotential = BitBoardMovesBlackPawn( move.iSrcRF, bPawnsMoved );
                 break;
-            case PIECE_ROOK  : bValid = BitBoardMovesColorRook  ( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
-            case PIECE_KNIGHT: bValid = BitBoardMovesColorKnight( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
-            case PIECE_BISHOP: bValid = BitBoardMovesColorBishop( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
-            case PIECE_QUEEN : bValid = BitBoardMovesColorQueen ( move.iSrcRF ) & move.bBoardDst ? 1:0 ; break;
-            case PIECE_KING  :
-                bitboard_t bBoardCastle = 0;
+            case PIECE_ROOK  : bBoardPotential = BitBoardMovesColorRook  ( move.iSrcRF ); break;
+            case PIECE_KNIGHT: bBoardPotential = BitBoardMovesColorKnight( move.iSrcRF ); break;
+            case PIECE_BISHOP: bBoardPotential = BitBoardMovesColorBishop( move.iSrcRF ); break;
+            case PIECE_QUEEN : bBoardPotential = BitBoardMovesColorQueen ( move.iSrcRF ); break;
+            case PIECE_KING  : bBoardPotential = BitBoardMovesColorKing  ( move.iSrcRF );
+                bitboard_t bBoardCastle = move.bBoardDst;
                 if (move.iPlayer == PLAYER_WHITE)
                 {
                     if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C1 );
@@ -376,9 +375,12 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                     if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardCastle |= BitBoardMakeLocation( _C8 );
                     if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardCastle |= BitBoardMakeLocation( _G8 );
                 }
-                bValid = BitBoardMovesColorKing  ( move.iSrcRF ) & (move.bBoardDst | bBoardCastle) ? 1:0 ;
+                bValid = bBoardPotential & bBoardCastle ? 1 : 0;
+                return bValid;
                 break;
         }
+
+        bValid = bBoardPotential & move.bBoardDst ? 1 : 0;
 
         // If dest is same color as player mark invalid
         // If new state IsCheck() not a valid move
