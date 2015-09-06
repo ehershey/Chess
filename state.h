@@ -122,12 +122,18 @@ struct State_t
                 printf( "ERROR: Invalid Capture with unknown piece!\n" );
         }
 
+//        _bMoveType &= ~MOVE_PIECE_MASK;
+//        _bMoveType |=  move.iPieceSrc;
+
         return bValid;
     }
 
     bool CaptureBishop( const Move_t& move )
     {
         bool bValid = false;
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
 
         return bValid;
     }
@@ -136,6 +142,9 @@ struct State_t
     {
         bool bValid = false;
 
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
+
         return bValid;
     }
 
@@ -143,12 +152,20 @@ struct State_t
     {
         bool bValid = false;
 
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
+
         return bValid;
     }
 
     bool CapturePawn( const Move_t& move )
     {
         bool bValid = false;
+
+        DoCapture( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
 
         return bValid;
     }
@@ -164,12 +181,18 @@ struct State_t
         // still can castle, Check if iDstRF == A8, then can't castle Q side
         // still can castle, Check if iDstRF == H8, then can't castle K side
 
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
+
         return bValid;
     }
 
     bool CaptureQueen( const Move_t& move )
     {
         bool bValid = false;
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        _bMoveType |= MOVE_CAPTURE_ENEMY;
 
         return bValid;
     }
@@ -192,6 +215,23 @@ struct State_t
             StateBitBoard_t *pState = &_player[ iPlayer ];
             pState->DelPiece( nDstRF );
         }
+    }
+
+    void DoCapture( const Move_t move )
+    {
+        _iSrcRF = move.iSrcRF;
+        _iDstRF = move.iDstRF;
+
+        bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
+        bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
+
+        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardOld;
+        _player[ move.iPlayer ]._aBoards[ move.iPieceSrc ] &= ~boardNew;
+
+        _player[ move.iEnemy  ]._aBoards[ move.iPieceDst ] &= ~boardNew;
+
+        // IsCheckmate()?
+        // IsCheck()?
     }
 
     // Remove piece from old location, place piece onto new location
@@ -436,8 +476,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                 printf( "ERROR: Invalid Move with unknown piece!\n" );
         }
 
-        _bMoveType &= ~MOVE_PIECE_MASK;
-        _bMoveType |=  move.iPieceSrc;
+        if ( bValid )
+        {
+            _bMoveType &= ~MOVE_PIECE_MASK;
+            _bMoveType |=  move.iPieceSrc;
+        }
 
         return bValid;
     }
@@ -572,6 +615,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
+
         return bValid;
     }
 
@@ -583,6 +631,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         DoMove( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
 
         int iSrcRank = move.iSrcRF >> 4;
         int iDstRank = move.iDstRF >> 4;
@@ -601,6 +650,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
+
         return bValid;
     }
 
@@ -612,22 +666,27 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
         int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
-            if (move.iPlayerSrc == PLAYER_WHITE)
-            {
-                if( bCanCastleQ && (move.iSrcRF == _A1) )
-                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+        if (move.iPlayerSrc == PLAYER_WHITE)
+        {
+            if( bCanCastleQ && (move.iSrcRF == _A1) )
+                _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-                if( bCanCastleK && (move.iSrcRF == _A8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
-            }
-            else // PLAYER_BLACK
-            {
-                if( bCanCastleQ && (move.iSrcRF == _A8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+            if( bCanCastleK && (move.iSrcRF == _A8) )
+                _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+        }
+        else // PLAYER_BLACK
+        {
+            if( bCanCastleQ && (move.iSrcRF == _A8) )
+                _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
 
-                if( bCanCastleK && (move.iSrcRF == _H8) )
-                    _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
-            }
+            if( bCanCastleK && (move.iSrcRF == _H8) )
+                _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+        }
+
+        DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
 
         return bValid;
     }
