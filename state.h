@@ -706,7 +706,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         if ((nDistance == 2) || (nDistance == -2))
             _bMoveType |= MOVE_PAWN_DOUBLE;
 
-        _bPawnsMoved[ move.iPlayer ] |= (1 << iSrcFile);
+        _bPawnsMoved[ move.iPlayer ] |= (1 << (7 - iSrcFile)); // must keep in sync with bitboard layout
 
         return bValid;
     }
