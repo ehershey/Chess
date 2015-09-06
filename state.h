@@ -132,6 +132,9 @@ struct State_t
     {
         bool bValid = false;
 
+        bValid = true;
+        DoCapture( move );
+
         _bMoveType &= ~MOVE_FLAGS_MASK;
         _bMoveType |= MOVE_CAPTURE_ENEMY;
 
@@ -141,6 +144,9 @@ struct State_t
     bool CaptureKing( const Move_t& move )
     {
         bool bValid = false;
+
+        bValid = true;
+        DoCapture( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
         _bMoveType |= MOVE_CAPTURE_ENEMY;
@@ -152,6 +158,9 @@ struct State_t
     {
         bool bValid = false;
 
+        bValid = true;
+        DoCapture( move );
+
         _bMoveType &= ~MOVE_FLAGS_MASK;
         _bMoveType |= MOVE_CAPTURE_ENEMY;
 
@@ -162,6 +171,7 @@ struct State_t
     {
         bool bValid = false;
 
+        bValid = true;
         DoCapture( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
@@ -181,6 +191,9 @@ struct State_t
         // still can castle, Check if iDstRF == A8, then can't castle Q side
         // still can castle, Check if iDstRF == H8, then can't castle K side
 
+        bValid = true;
+        DoCapture( move );
+
         _bMoveType &= ~MOVE_FLAGS_MASK;
         _bMoveType |= MOVE_CAPTURE_ENEMY;
 
@@ -190,6 +203,9 @@ struct State_t
     bool CaptureQueen( const Move_t& move )
     {
         bool bValid = false;
+
+        bValid = true;
+        DoCapture( move );
 
         _bMoveType &= ~MOVE_FLAGS_MASK;
         _bMoveType |= MOVE_CAPTURE_ENEMY;
