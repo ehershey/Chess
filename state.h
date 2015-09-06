@@ -603,8 +603,8 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
                 if( boardPotential & move.bBoardDst )
                 {
-                    bool bPassThroughCheck = IsCheck( move.iDstRF );
-                    if ( bPassThroughCheck ) // Can't move into check
+                    bool bPassIntoCheck = IsCheck( move.iDstRF );
+                    if ( bPassIntoCheck ) // Can't move into check
                         return false;
 
                     DoMove( move );
