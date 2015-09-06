@@ -11,12 +11,11 @@ enum Pieces_e
 
     NUM_PIECES         = PIECE_EMPTY,
     PIECE_MASK         = 7,
+    PIECE_COLOR_OFFSET = 8, // piece / offset -> which player (color)
 };
 
 enum ColorPieces_e
 {
-    PIECE_COLOR_OFFSET = 8, // piece / offset -> which player (color)
-
 // Aliases
     WHITE_PAWN   = PIECE_PAWN   + (0 * PIECE_COLOR_OFFSET),
     WHITE_ROOK   = PIECE_ROOK   + (0 * PIECE_COLOR_OFFSET),
