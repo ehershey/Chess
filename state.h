@@ -222,13 +222,10 @@ struct State_t
         _iSrcRF = move.iSrcRF;
         _iDstRF = move.iDstRF;
 
-        bitboard_t boardOld = BitBoardMakeLocation( move.iSrcRF );
-        bitboard_t boardNew = BitBoardMakeLocation( move.iDstRF );
+        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] &= ~move.bBoardSrc;
+        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] |=  move.bBoardDst;
 
-        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] &= ~boardOld;
-        _player[ move.iPlayer   ]._aBoards[ move.iPieceSrc & PIECE_MASK ] |=  boardNew;
-
-        _player[ move.iPlayer^1 ]._aBoards[ move.iPieceDst & PIECE_MASK ] &= ~boardNew;
+        _player[ move.iPlayer^1 ]._aBoards[ move.iPieceDst & PIECE_MASK ] &= ~move.bBoardDst;
 
         // IsCheckmate()?
         // IsCheck()?
