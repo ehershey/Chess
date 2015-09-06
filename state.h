@@ -227,7 +227,6 @@ struct State_t
 
         _player[ move.iPlayer^1 ]._aBoards[ move.iPieceDst & PIECE_MASK ] &= ~move.bBoardDst;
 
-        // IsCheckmate()?
         // IsCheck()?
     }
 
@@ -243,7 +242,6 @@ struct State_t
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc & PIECE_MASK ] &= ~boardOld;
         _player[ move.iPlayer ]._aBoards[ move.iPieceSrc & PIECE_MASK ] |=  boardNew;
 
-        // IsCheckmate()?
         // IsCheck()?
     }
 
@@ -330,6 +328,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     */
     bool IsCheck( uint8_t nKingRF ) // = INVALID_MOVE_RF
     {
+        bool    bIsCheck    = false;
         uint8_t iPlayer     = GetColorPlayer();
         uint8_t iEnemy      = GetColorEnemy ();
         uint8_t bPawnsMoved = _bPawnsMoved[ iEnemy ];
@@ -381,7 +380,15 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             }
         } // for piece
 
-        return false; // FIXME:
+        if( bIsCheck )
+        {
+            uint8_t nMoves;
+            uint8_t aMoves[ MAX_PIECE_MOVES ];
+            BitBoardToRankFileAllMoves( origin, nMoves, aMoves, MAX_PIECE_MOVES );
+            // IsCheckmate()?
+        }
+
+        return bIsCheck;
     }
 
     bool IsCheckPassInto( const Move_t& move )
