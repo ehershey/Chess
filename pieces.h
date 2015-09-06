@@ -1,13 +1,16 @@
 enum Pieces_e
 {
-    PIECE_PAWN  , // 0
-    PIECE_ROOK  , // 1
-    PIECE_KNIGHT, // 2
-    PIECE_BISHOP, // 3
-    PIECE_QUEEN , // 4
-    PIECE_KING  , // 5
-    PIECE_EMPTY ,// Optimization: switch from very last byte (=7) to save 1 byte in aPIECES; since we need +1 for NULL terminator
-    NUM_PIECES  = PIECE_EMPTY,
+    PIECE_PAWN   , // 0
+    PIECE_ROOK   , // 1
+    PIECE_KNIGHT , // 2
+    PIECE_BISHOP , // 3
+    PIECE_QUEEN  , // 4
+    PIECE_KING   , // 5
+    PIECE_EMPTY  ,// Optimization: switch from very last byte (=7) to save 1 byte in aPIECES; since we need +1 for NULL terminator
+    PIECE_UNKNOWN,
+
+    NUM_PIECES   = PIECE_EMPTY,
+    PIECE_MASK   = 7,
 
 // Aliases
     WHITE_PAWN   = PIECE_PAWN  ,
@@ -27,7 +30,7 @@ enum Pieces_e
     BLACK_EMPTY  = PIECE_EMPTY  + 8,
 };
 
-// 16 chars including the NULL, the '?' is PIECE_NOT_USED=7
+// 16 chars including the NULL, the '?' is PIECE_UKNOWN, the end NULLis BLACK_PIECE_UNKNOWN
 const char aPIECES[] = "PRNBQK ?prnbqk "; // Uppercase = White, Lowercase = Black
 
 enum Player_e
