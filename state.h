@@ -489,6 +489,11 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
+        DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
+
         return bValid;
     }
 
@@ -599,11 +604,14 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                 if( boardPotential & move.bBoardDst )
                 {
                     bool bPassThroughCheck = IsCheck( move.iDstRF );
-
-                    if( bPassThroughCheck ) // Can't move into check
+                    if ( bPassThroughCheck ) // Can't move into check
                         return false;
 
                     DoMove( move );
+
+                    _bMoveType &= ~MOVE_FLAGS_MASK;
+                    // Optimziation: _bMoveType |= MOVE_NORMAL
+
                     bValid = true;
                 }
             }
@@ -646,18 +654,6 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         return bValid;
     }
 
-    bool MoveQueen( const Move_t& move )
-    {
-        bool bValid = false;
-
-        DoMove( move );
-
-        _bMoveType &= ~MOVE_FLAGS_MASK;
-        // Optimziation: _bMoveType |= MOVE_NORMAL
-
-        return bValid;
-    }
-
     bool MoveRook( const Move_t& move )
     {
         bool bValid = false;
@@ -682,6 +678,18 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             if( bCanCastleK && (move.iSrcRF == _H8) )
                 _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
         }
+
+        DoMove( move );
+
+        _bMoveType &= ~MOVE_FLAGS_MASK;
+        // Optimziation: _bMoveType |= MOVE_NORMAL
+
+        return bValid;
+    }
+
+    bool MoveQueen( const Move_t& move )
+    {
+        bool bValid = false;
 
         DoMove( move );
 
