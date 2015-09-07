@@ -240,6 +240,9 @@ int main( const int nArg, const char *aArg[] )
             if( strcmp( aCmds[0], "cls" ) == 0 )
                 game.Clear();
             else
+            if( strcmp( aCmds[0], "fen" ) == 0 )
+                game.InputFEN( sInputRaw+3 );
+            else
                 bBadCommand = true;
         }
         else
@@ -250,6 +253,22 @@ int main( const int nArg, const char *aArg[] )
             if( strcmp( aCmds[0], "clear") == 0 ) // clear board
             {
                 game.Clear();
+            }
+            else
+            if( strcmp( aCmds[0], "FEN:") == 0 )
+            {
+                // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+                // http://www.fam-petzke.de/cp_fen_en.shtml
+                // Starting position:
+                // FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+                // http://www.talkchess.com/forum/viewtopic.php?topic_view=threads&p=315993&t=31521&sid=5387b12f25a59c9036c16e6ac900b015
+                //   1. e4 e5   ->  1. e2e4 e7e5
+                //   2. d3 *    ->  2. d2d3
+                // And:
+                //   1. d3 e5   ->  1. d2d4 e7e5
+                //   2. e4 *    ->  2. e2e4
+                // rnbqkbnr/pppp1ppp/8/4p3/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 2
+                game.InputFEN( sInputRaw+4 );
             }
             else
             if( strcmp( aCmds[0], "random") == 0 )
