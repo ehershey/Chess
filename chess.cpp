@@ -1,6 +1,7 @@
 #include <stdio.h>  // printf
 #include <stdint.h> // uint64_t
 #include <string.h> // memcpy
+#include <stdlib.h> // atoi() // overkill
 
 // BEGIN OMP
     #include <omp.h>
