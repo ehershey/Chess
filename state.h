@@ -625,7 +625,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                     bitboard_t boardAll     = GetAllPieces();
                     bitboard_t boardNewKing = BitBoardMakeLocation( castle.nNewKingRF );
                     bitboard_t boardNewRook = BitBoardMakeLocation( castle.nNewRookRF );
-                    bitboard_t boardOldKing = BitBoardMakeLocation( move.iSrcRF );
+                  //bitboard_t boardOldKing = BitBoardMakeLocation( move.iSrcRF );
                     bitboard_t boardOldRook = BitBoardMakeLocation( castle.nOldRookRF );
 
                     if (boardAll & boardNewKing) // if (iPieceDst == PIECE_EMPTY)
@@ -729,7 +729,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
         int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
         int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
-        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
+      //int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
 
         if ( IsCheckPassInto( move ) )
             return bValid;
