@@ -20,7 +20,7 @@ struct ChessGame_t
 
     void Clear()
     {
-        _aMoves[ _nMoves ].Clear();
+        _aMoves[ _nMoves ].ClearBoard();
     }
 
     void Edit( int iPlayer, int iPiece, uint8_t nDstRF )
@@ -37,6 +37,10 @@ struct ChessGame_t
 
         while (*fen == ' ')
             fen++;
+
+        State_t    state;
+        state.ClearBoard();
+        state.ResetFlags();
 
         bitboard_t mask = 0x8000000000000000ull;
 

@@ -213,7 +213,7 @@ struct State_t
         return bValid;
     }
 
-    void Clear()
+    void ClearBoard()
     {
         StateBitBoard_t *pState;
 
@@ -282,7 +282,7 @@ struct State_t
 printf( "INFO: Boards[]: %u bytes\n", (uint32_t) sizeof( _player ) );
 printf( "INFO: State   : %u bytes\n", (uint32_t) sizeof( *this    ) );
 
-        Reset();
+        ResetFlags();
 
 //printf( "State.Flags: %08X\n", _bFlags );
 
@@ -814,7 +814,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
         board.PrintPretty( bPrintRankFile );
     }
 
-    void Reset()
+    void ResetFlags()
     {
         // Move
         _bFlags         = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
