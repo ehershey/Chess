@@ -35,6 +35,8 @@ struct ChessGame_t
         || (strncmp( fen, "fen", 3) == 0))
             fen += 3;
 
+//printf( "raw: %s\n", fen );
+
         while (*fen == ' ')
             fen++;
 
@@ -42,13 +44,17 @@ struct ChessGame_t
         state.ClearBoard();
         state.ResetFlags();
 
-        // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-        // FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-        bitboard_t origin = 0x8000000000000000ull;
+/*
+    https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
 
+FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+*/
+        bitboard_t origin = 0x8000000000000000ull;
+//int debug = 0;
         // SECTION_BOARD
         while (*fen && (*fen != ' '))
         {
+//printf( "[%2d]: '%c'\n", debug++, *fen );
             int iPiece = PIECE_UNKNOWN;
             switch( *fen )
             {
@@ -86,6 +92,7 @@ struct ChessGame_t
             if (iPiece != PIECE_UNKNOWN)
             {
                 int iPlayer = iPiece / 8;
+//printf( "Piece: %c  Player: %d\n", aPIECES[ iPiece ], iPlayer );
                 state._player[ iPlayer ]._aBoards[ iPiece & PIECE_MASK ] |= origin;
                 origin >>= 1;
             }
@@ -95,6 +102,8 @@ struct ChessGame_t
 
         if( origin )
         {
+//printf( "org0: %08X\n", (uint32_t) (origin >> 32) );
+//printf( "org1: %08X\n", (uint32_t) (origin >>  0) );
             printf( "Invalid FEN input: bad board state\n" );
             return;
         }
@@ -105,6 +114,7 @@ struct ChessGame_t
         // SECTION_COLOR_TO_PLAY_NEXT
         while (*fen && (*fen != ' '))
         {
+//printf( "C2PN: %c\n", *fen );
             switch( *fen )
             {
                 case 'w': state.SetColorPlayer( PLAYER_WHITE ); break;
@@ -123,6 +133,7 @@ struct ChessGame_t
         state._bFlags &= ~STATE_CAN_CASTLE_MASK;
         while (*fen && (*fen != ' '))
         {
+//printf( "CASTLE: %c\n", *fen );
             switch( *fen )
             {
                 case 'K': state._bFlags |= STATE_CAN_CASTLE_WK_SIDE; break;
@@ -144,9 +155,13 @@ struct ChessGame_t
         // TODO: set _bPawnsMoved[ iPlayer ] true
         while (*fen && (*fen != ' '))
         {
+//printf( "EP: %c\n", *fen );
             switch( *fen )
             {
                 case '-': break; // no pawn moved
+                default: // FIXME: last EP location
+                    printf( "FIXME: FEN: Ignoring last E.P location\n" );
+                    break;
             }
             fen++;
         }
@@ -154,14 +169,14 @@ struct ChessGame_t
         // Check if white pawns on home row
         // Check if black pawns on home row
 
-        while (*fen && (*fen != ' '))
-        {
+        while (*fen == ' ')
             fen++;
-        }
 
         // SECTION_NUM_HALF_MOVES_LAST_CAPTURE_OR_PAWN_MOVE
         while (*fen && (*fen != ' '))
         {
+//printf( "HALF: %c\n", *fen );
+            // FIXME: Half Moves
             fen++;
         }
 
@@ -169,6 +184,8 @@ struct ChessGame_t
             fen++;
 
         // SECTION_MOVE_NUM
+//printf( "MOVE: %s\n", fen );
+
         state._iParent = 0; // signal is first move in game
 
         _nMoves = atoi( fen );
