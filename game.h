@@ -29,6 +29,27 @@ struct ChessGame_t
         _aMoves[ _nMoves ].AddPiece( iPlayer, iPiece, nDstRF );
     }
 
+    void InputFEN( const char *fen )
+    {
+        if((strncmp( fen, "FEN", 3) == 0)
+        || (strncmp( fen, "fen", 3) == 0))
+            fen += 3;
+
+        while (*fen == ' ')
+            fen++;
+
+        bitboard_t mask = 0x8000000000000000ull;
+
+        while( *fen && mask )
+        {
+            switch( *fen )
+            {
+            }
+
+            fen++;
+        }
+    }
+
     bool MoveOrCapture( uint8_t nSrcRF, uint8_t nDstRF )
     {
         _aMoves[ _nMoves+1 ] = _aMoves[ _nMoves ];
