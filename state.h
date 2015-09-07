@@ -50,8 +50,14 @@ enum StateFlags_e
     ,STATE_STALEMATE         = (1 << 3)
     ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4) // TODO: do we need same shift as STATE_CAN_CASTLE_Q_SIDE == MOVE_CASTLED_Q_SIDE ?
     ,STATE_CAN_CASTLE_K_SIDE = (1 << 5) // TODO: do we need same shift as STATE_CAN_CASTLE_K_SIDE == MOVE_CASTLED_K_SIDE ?
+// FIXME: Need to keep track of black's castle state too
+    ,STATE_CAN_CASTLE_WQ_SIDE= (1 << 4)
+    ,STATE_CAN_CASTLE_WK_SIDE= (1 << 5)
+    ,STATE_CAN_CASTLE_BQ_SIDE= (1 << 6)
+    ,STATE_CAN_CASTLE_BK_SIDE= (1 << 7)
 
-    ,STATE_CAN_CASTLE_MASK   = STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE
+    ,STATE_CAN_CASTLE_MASK   = STATE_CAN_CASTLE_WQ_SIDE | STATE_CAN_CASTLE_WK_SIDE
+                             | STATE_CAN_CASTLE_BQ_SIDE | STATE_CAN_CASTLE_BK_SIDE
 };
 
 enum MoveFlags_e
@@ -841,17 +847,20 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
     }
 
-    /**
+    /** Disables Castling
         @param bWhichCastleSide
             0 = none
             MOVE_CASTLED_Q_SIDE
             MOVE_CASTLED_K_SIDE
     */
+    // TODO: Probably should be renamed DoCastle( move, bWhichCastleSide )
     void SetCastledFlags( int bWhichCastleSide )
     {
         _bFlags     &= ~STATE_CAN_CASTLE_MASK;
         _bMoveType  |= bWhichCastleSide      ;
     }
+
+inline void    SetColorPlayer( int iColor ) { _bFlags &= ~1; _bFlags |= (iColor & 1); }
 
 inline void    TogglePlayer  () {         _bFlags ^= STATE_WHICH_PLAYER; }
 
