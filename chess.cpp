@@ -97,7 +97,7 @@ printf( "RankFile: 0x%02X\n", nRF );
     @Note: Replaces arg seperator (space) with NULL
 */
 void GetInputArguments( char *sInput, int nMaxCmds,
-    int& nCmds_, char *aCmds_[], int aLens_[] )
+    int& nCmds_, char *aCmds_[], int *aLens_ )
 {
     char *start = sInput;
     int   iCmds = 0;
@@ -105,14 +105,21 @@ void GetInputArguments( char *sInput, int nMaxCmds,
     aCmds_[ iCmds ] = sInput;
     aLens_[ iCmds ] = 0;
 
-    for( char *end = sInput; *end && (iCmds < nMaxCmds); end++ )
+    for( char *end = sInput; *end; end++ )
     {
         if( *end == ' ' || *end == 0xA || *end == 0xD )
         {
+            if ((*end == 0xA) || (*end == 0xD))
+                *end = 0;
+
             aLens_[ iCmds ] = end - start;
             iCmds++;
-            aCmds_[ iCmds ] = start = end + 1;
-            *end = 0;
+
+            if (iCmds < nMaxCmds)
+                aCmds_[ iCmds ] = start = end + 1;
+            else
+                break;
+
         }
     }
 
@@ -156,17 +163,18 @@ int main( const int nArg, const char *aArg[] )
         printf( "%c>", aPLAYERS[ iNextPlayer ] );
 
         fflush( stdin );
-        char   sInputRaw[ 64 ];
+
+        const size_t MAX_INPUT = 64;
+        char   sInputRaw[ MAX_INPUT ];
         fgets( sInputRaw, sizeof( sInputRaw ), stdin );
-        sInputRaw[31] = 0;
+        sInputRaw[ MAX_INPUT-1 ] = 0;
 
-        char   sInputCooked[ 64 ];
+        char   sInputCooked[ MAX_INPUT ];
         strcpy( sInputCooked, sInputRaw );
-
         GetInputArguments( sInputCooked, MAX_COMMANDS, nCmds, aCmds, aLens );
 
         bBadCommand = false;
-        if( aLens[0] == 1 )
+        if (1 == aLens[0])
         {
             switch( aCmds[0][0] )
             {
@@ -228,35 +236,37 @@ int main( const int nArg, const char *aArg[] )
             }
         }
         else
-        if( aLens[0] == 2 )
+        if (2 == aLens[0])
         {
-            if( strcmp( aCmds[0], "ng" ) == 0 )
+            const int iLen = 2;
+            if( strncmp( aCmds[0], "ng", iLen ) == 0 )
                 game.Init();
             else
                 bBadCommand = true;
         }
         else
-        if( aLens[0] == 3 )
+        if (3 == aLens[0])
         {
-            if( strcmp( aCmds[0], "cls" ) == 0 )
+            const int iLen = 3;
+            if( strncmp( aCmds[0], "cls", iLen ) == 0 )
                 game.Clear();
             else
-            if( strcmp( aCmds[0], "fen" ) == 0 )
-                game.InputFEN( sInputRaw+3 );
+            if( strncmp( aCmds[0], "fen", iLen ) == 0 )
+                game.InputFEN( sInputRaw+iLen );
+            else
+            if( strncmp( aCmds[0], "new",iLen ) == 0 )
+                game.Init();
             else
                 bBadCommand = true;
         }
         else
+        if (4 == aLens[0])
         {
-            if( strcmp( aCmds[0], "quit" ) == 0 )
+            const int iLen = 4;
+            if( strncmp( aCmds[0], "quit", iLen ) == 0 )
                 bQuit = true;
             else
-            if( strcmp( aCmds[0], "clear") == 0 ) // clear board
-            {
-                game.Clear();
-            }
-            else
-            if( strcmp( aCmds[0], "FEN:") == 0 )
+            if( strncmp( aCmds[0], "FEN:", iLen) == 0 )
             {
                 // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
                 // http://www.fam-petzke.de/cp_fen_en.shtml
@@ -271,14 +281,16 @@ int main( const int nArg, const char *aArg[] )
                 // rnbqkbnr/pppp1ppp/8/4p3/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 2
                 game.InputFEN( sInputRaw+4 );
             }
+        }
+        else
+        {
+            if( strncmp( aCmds[0], "clear", 5) == 0 ) // clear board
+                game.Clear();
             else
-            if( strcmp( aCmds[0], "random") == 0 )
+            if( strncmp( aCmds[0], "random", 6) == 0 )
             {
                 ; // ignore xboard command
             }
-            else
-            if( strcmp( aCmds[0], "new" ) == 0 )
-                game.Init();
             else
                  bBadCommand = true;
         }
