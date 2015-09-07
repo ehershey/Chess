@@ -155,10 +155,14 @@ int main( const int nArg, const char *aArg[] )
         printf( "%c>", aPLAYERS[ iNextPlayer ] );
 
         fflush( stdin );
-        char   sInput[ 32 ];
-        fgets( sInput, sizeof( sInput ), stdin );
+        char   sInputRaw[ 64 ];
+        fgets( sInputRaw, sizeof( sInputRaw ), stdin );
+        sInputRaw[31] = 0;
 
-        GetInputArguments( sInput, MAX_COMMANDS, nCmds, aCmds, aLens );
+        char   sInputCooked[ 64 ];
+        strcpy( sInputCooked, sInputRaw );
+
+        GetInputArguments( sInputCooked, MAX_COMMANDS, nCmds, aCmds, aLens );
 
         bBadCommand = false;
         if( aLens[0] == 1 )
