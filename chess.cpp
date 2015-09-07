@@ -107,7 +107,7 @@ void GetInputArguments( char *sInput, int nMaxCmds,
 
     for( char *end = sInput; *end; end++ )
     {
-        if( *end == ' ' || *end == 0xA || *end == 0xD )
+        if (*end == ' ' || *end == 0xA || *end == 0xD)
         {
             if ((*end == 0xA) || (*end == 0xD))
                 *end = 0;
@@ -184,7 +184,7 @@ int main( const int nArg, const char *aArg[] )
 
                     for( int iPiece = 0; iPiece < (int) sizeof( aPIECES ); iPiece++ )
                     {
-                        if( aPIECES[ iPiece ] == aCmds[1][0] )
+                        if (aPIECES[ iPiece ] == aCmds[1][0])
                             iSrcPiece = iPiece;
                     }
 
@@ -192,7 +192,7 @@ int main( const int nArg, const char *aArg[] )
                     if ((iDstPiece >= PIECE_PAWN ) && (iDstPiece <= PIECE_KING))
                     {
                         int color = PLAYER_WHITE;
-                        if( iSrcPiece > NUM_PIECES)
+                        if (iSrcPiece > NUM_PIECES)
                             color = PLAYER_BLACK;
 
                         nDstRF = GetInputLocation( aCmds[1]+1, aLens[1]-1 );
@@ -219,7 +219,7 @@ int main( const int nArg, const char *aArg[] )
                         //iDstPiece = BoardGetPiece( nDsrRF );
                         //bool bDirectCaptures  = // Player x Enemy
                         //bool bIndirectCapture = // pawn: en-passant
-                        if( game.MoveOrCapture( nSrcRF, nDstRF ) )
+                        if (game.MoveOrCapture( nSrcRF, nDstRF ))
                             game.NextTurn();
                     }
                     break;
@@ -239,7 +239,7 @@ int main( const int nArg, const char *aArg[] )
         if (2 == aLens[0])
         {
             const int iLen = 2;
-            if( strncmp( aCmds[0], "ng", iLen ) == 0 )
+            if (strncmp( aCmds[0], "ng", iLen ) == 0)
                 game.Init();
             else
                 bBadCommand = true;
@@ -248,13 +248,13 @@ int main( const int nArg, const char *aArg[] )
         if (3 == aLens[0])
         {
             const int iLen = 3;
-            if( strncmp( aCmds[0], "cls", iLen ) == 0 )
+            if (strncmp( aCmds[0], "cls", iLen ) == 0)
                 game.Clear();
             else
-            if( strncmp( aCmds[0], "fen", iLen ) == 0 )
+            if (strncmp( aCmds[0], "fen", iLen ) == 0)
                 game.InputFEN( sInputRaw+iLen );
             else
-            if( strncmp( aCmds[0], "new",iLen ) == 0 )
+            if (strncmp( aCmds[0], "new",iLen ) == 0)
                 game.Init();
             else
                 bBadCommand = true;
@@ -263,10 +263,10 @@ int main( const int nArg, const char *aArg[] )
         if (4 == aLens[0])
         {
             const int iLen = 4;
-            if( strncmp( aCmds[0], "quit", iLen ) == 0 )
+            if (strncmp( aCmds[0], "quit", iLen ) == 0)
                 bQuit = true;
             else
-            if( strncmp( aCmds[0], "FEN:", iLen) == 0 )
+            if (strncmp( aCmds[0], "FEN:", iLen) == 0)
             {
                 // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
                 // http://www.fam-petzke.de/cp_fen_en.shtml
@@ -284,10 +284,10 @@ int main( const int nArg, const char *aArg[] )
         }
         else
         {
-            if( strncmp( aCmds[0], "clear", 5) == 0 ) // clear board
+            if (strncmp( aCmds[0], "clear", 5) == 0) // clear board
                 game.Clear();
             else
-            if( strncmp( aCmds[0], "random", 6) == 0 )
+            if (strncmp( aCmds[0], "random", 6) == 0)
             {
                 ; // ignore xboard command
             }
@@ -295,7 +295,7 @@ int main( const int nArg, const char *aArg[] )
                  bBadCommand = true;
         }
 
-        if( bBadCommand )
+        if ( bBadCommand )
             printf( "Ignored command: %s\n", aCmds[0] );
     }; // while bGameRunning
 
