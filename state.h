@@ -1,6 +1,8 @@
 struct Castle_t
 {
-    uint8_t bWhichSide; // 0=no castle, or assume non-zero: STATE_CAN_CASTLE_Q_SIDE STATE_CAN_CASTLE_K_SIDE
+    // Probably should nibble-pack into first byte
+    uint8_t bWhichSide; // 0=no castle, MOVE_CASTLED_Q_SIDE or MOVE_CASTLED_K_SIDE
+    uint8_t bCanCastle; // Q and K castle flags mask to set castle state has happened
     uint8_t nNewKingRF; // must test if square empty
     uint8_t nNewRookRF; // must test if square empty
     uint8_t nOldRookRF;
@@ -46,18 +48,15 @@ enum StateFlags_e
 {
      STATE_WHICH_PLAYER      = (1 << 0) // 0=White 1=Black // Optimization: Could encode in _bMoveType, and use 4-bit of Piece type
     ,STATE_CHECK             = (1 << 1)
-    ,STATE_CHECKMATE         = (1 << 2)
-    ,STATE_STALEMATE         = (1 << 3)
-    ,STATE_CAN_CASTLE_Q_SIDE = (1 << 4) // TODO: do we need same shift as STATE_CAN_CASTLE_Q_SIDE == MOVE_CASTLED_Q_SIDE ?
-    ,STATE_CAN_CASTLE_K_SIDE = (1 << 5) // TODO: do we need same shift as STATE_CAN_CASTLE_K_SIDE == MOVE_CASTLED_K_SIDE ?
-// FIXME: Need to keep track of black's castle state too
-    ,STATE_CAN_CASTLE_WQ_SIDE= (1 << 4)
-    ,STATE_CAN_CASTLE_WK_SIDE= (1 << 5)
-    ,STATE_CAN_CASTLE_BQ_SIDE= (1 << 6)
-    ,STATE_CAN_CASTLE_BK_SIDE= (1 << 7)
+    ,STATE_CAN_CASTLE_WQ_SIDE= (1 << 2) // MOVE_CASTLED_Q_SIDE = (STATE_CAN_CASTLE_WQ_SIDE >> iPlayer)
+    ,STATE_CAN_CASTLE_WK_SIDE= (1 << 3) // MOVE_CASTLED_K_SIDE = (STATE_CAN_CASTLE_WK_SIDE >> iPlayer)
+    ,STATE_CAN_CASTLE_BQ_SIDE= (1 << 4) // MOVE_CASTLED_Q_SIDE = (STATE_CAN_CASTLE_BQ_SIDE >> iPlayer)
+    ,STATE_CAN_CASTLE_BK_SIDE= (1 << 5) // MOVE_CASTLED_K_SIDE = (STATE_CAN_CASTLE_BK_SIDE >> iPlayer)
+    ,STATE_CHECKMATE         = (1 << 6)
+    ,STATE_STALEMATE         = (1 << 7)
 
-    ,STATE_CAN_CASTLE_MASK   = STATE_CAN_CASTLE_WQ_SIDE | STATE_CAN_CASTLE_WK_SIDE
-                             | STATE_CAN_CASTLE_BQ_SIDE | STATE_CAN_CASTLE_BK_SIDE
+    ,STATE_CAN_CASTLE_W = STATE_CAN_CASTLE_WQ_SIDE | STATE_CAN_CASTLE_WK_SIDE
+    ,STATE_CAN_CASTLE_B = STATE_CAN_CASTLE_BQ_SIDE | STATE_CAN_CASTLE_BK_SIDE
 };
 
 enum MoveFlags_e
@@ -464,12 +463,12 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
             case WHITE_QUEEN :
             case BLACK_QUEEN : bBoardPotential = BitBoardMovesColorQueen ( move.iSrcRF ); break;
             case WHITE_KING  : bBoardPotential = BitBoardMovesColorKing  ( move.iSrcRF );
-                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardDst |= BitBoardMakeLocation( _C1 );
-                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardDst |= BitBoardMakeLocation( _G1 );
+                if (_bFlags & STATE_CAN_CASTLE_WQ_SIDE) bBoardDst |= BitBoardMakeLocation( _C1 );
+                if (_bFlags & STATE_CAN_CASTLE_WK_SIDE) bBoardDst |= BitBoardMakeLocation( _G1 );
                 break;
             case BLACK_KING  : bBoardPotential = BitBoardMovesColorKing  ( move.iSrcRF );
-                if (_bFlags & STATE_CAN_CASTLE_Q_SIDE) bBoardDst |= BitBoardMakeLocation( _C8 );
-                if (_bFlags & STATE_CAN_CASTLE_K_SIDE) bBoardDst |= BitBoardMakeLocation( _G8 );
+                if (_bFlags & STATE_CAN_CASTLE_BQ_SIDE) bBoardDst |= BitBoardMakeLocation( _C8 );
+                if (_bFlags & STATE_CAN_CASTLE_BK_SIDE) bBoardDst |= BitBoardMakeLocation( _G8 );
                 break;
         }
 
@@ -569,102 +568,98 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
-        int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
-        int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
-
 //printf( ">Move() State.Flags: %08X\n", _bFlags );
 //printf( ">Move() KING  Castle: %s\n", bCanCastle ? "Yes" : "NO " );
             // Input: e1g1, e1c1, e8g8, e8c8
-            if ( bCanCastle )
-            {
-                Castle_t castle;
-                castle.bWhichSide = 0;
-                castle.nNewKingRF = move.iDstRF;
+            Castle_t castle;
+            castle.bWhichSide = 0;
+            castle.nNewKingRF = move.iDstRF;
 
-                if (move.iPlayer == PLAYER_WHITE)
+            if (move.iPlayer == PLAYER_WHITE)
+            {
+                castle.bCanCastle = STATE_CAN_CASTLE_W;
+
+                if ((_bFlags & STATE_CAN_CASTLE_WQ_SIDE)
+                && (move.iSrcRF == _E1)
+                && (move.iDstRF == _C1))
                 {
-                    if (move.iSrcRF == _E1)
-                    {
-                        if (bCanCastleQ && (move.iDstRF == _C1))
-                        {
-                            castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
-                            castle.nNewKingRF = _C1;
-                            castle.nNewRookRF = _D1;
-                            castle.nOldRookRF = _A1;
-                        }
-                        else
-                        if (bCanCastleK && (move.iDstRF == _G1))
-                        {
-                            castle.bWhichSide = MOVE_CASTLED_K_SIDE;
-                            castle.nNewKingRF = _G1;
-                            castle.nNewRookRF = _F1;
-                            castle.nOldRookRF = _H1;
-                        }
-                    }
+                    castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
+                    castle.nNewKingRF = _C1;
+                    castle.nNewRookRF = _D1;
+                    castle.nOldRookRF = _A1;
                 }
                 else
+                if ((_bFlags & STATE_CAN_CASTLE_WQ_SIDE)
+                && (move.iSrcRF == _E1)
+                && (move.iDstRF == _G1))
                 {
-                    if (move.iSrcRF == _E8)
-                    {
-                        if (bCanCastleQ && (move.iDstRF == _C8))
-                        {
-                            castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
-                            castle.nNewKingRF = _C8;
-                            castle.nNewRookRF = _D8;
-                            castle.nOldRookRF = _A8;
-                        }
-                        else
-                        if (bCanCastleK && (move.iDstRF == _G8))
-                        {
-                            castle.bWhichSide = MOVE_CASTLED_K_SIDE;
-                            castle.nNewKingRF = _G8;
-                            castle.nNewRookRF = _F8;
-                            castle.nOldRookRF = _H8;
-                        }
-                    }
+                    castle.bWhichSide = MOVE_CASTLED_K_SIDE;
+                    castle.nNewKingRF = _G1;
+                    castle.nNewRookRF = _F1;
+                    castle.nOldRookRF = _H1;
                 }
+            }
+            else // PLAYER_BLACK
+            {
+                castle.bCanCastle = STATE_CAN_CASTLE_B;
 
-                if ( castle.bWhichSide ) // Attempt to castle?
+                if ((_bFlags & STATE_CAN_CASTLE_BQ_SIDE)
+                && (move.iSrcRF == _E8)
+                && (move.iDstRF == _C8))
                 {
-                    // Verify no other pieces between king and rook
-                    bitboard_t boardAll     = GetAllPieces();
-                    bitboard_t boardNewKing = BitBoardMakeLocation( castle.nNewKingRF );
-                    bitboard_t boardNewRook = BitBoardMakeLocation( castle.nNewRookRF );
-                  //bitboard_t boardOldKing = BitBoardMakeLocation( move.iSrcRF );
-                    bitboard_t boardOldRook = BitBoardMakeLocation( castle.nOldRookRF );
-
-                    if (boardAll & boardNewKing) // if (iPieceDst == PIECE_EMPTY)
-                        return false;
-
-                    if (boardAll & boardNewRook)
-                        return false;
-
-                    // Verify Player's own rook exists in the correct location
-                    if (! (_player[ move.iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook))
-                        return false;
-
-                    bool bIsCheck0         = IsCheck( castle.nNewKingRF ); // FIXME: Verify enemy
-                    bool bIsCheck1         = IsCheck( castle.nNewRookRF );
-                    bool bPassThroughCheck = bIsCheck0 | bIsCheck1;
-                    if ( bPassThroughCheck )
-                        return false;
-
-                    // _bFlags |=  STATE_GAME_MID;
-
-                    Move_t moveKing = MakeMove( move.iSrcRF      , castle.nNewKingRF );
-                    Move_t moveRook = MakeMove( castle.nOldRookRF, castle.nNewRookRF );
-
-                    DoMove( moveKing ); // Remove old king, place new king
-                    DoMove( moveRook ); // Remove old rook, place new rook
-
-                    bValid = true;
+                    castle.bWhichSide = MOVE_CASTLED_Q_SIDE;
+                    castle.nNewKingRF = _C8;
+                    castle.nNewRookRF = _D8;
+                    castle.nOldRookRF = _A8;
                 }
+                else
+                if ((_bFlags & STATE_CAN_CASTLE_BQ_SIDE)
+                && (move.iSrcRF == _E8)
+                && (move.iDstRF == _G8))
+                {
+                    castle.bWhichSide = MOVE_CASTLED_K_SIDE;
+                    castle.nNewKingRF = _G8;
+                    castle.nNewRookRF = _F8;
+                    castle.nOldRookRF = _H8;
+                }
+            }
 
-                // King moved, can't castle anymore
-                SetCastledFlags( castle.bWhichSide ); // Optimization, 0=none, else
-            } // can castle
-            else
+            if ( castle.bWhichSide ) // Attempt to castle?
+            {
+                // Verify no other pieces between king and rook
+                bitboard_t boardAll     = GetAllPieces();
+                bitboard_t boardNewRook = BitBoardMakeLocation( castle.nNewRookRF );
+                bitboard_t boardOldRook = BitBoardMakeLocation( castle.nOldRookRF );
+
+                // bBoardSrc is alias for boardOldKing
+                // bBoardDst is alias for boardNewKing
+                if (boardAll & move.bBoardDst) // if (iPieceDst == PIECE_EMPTY)
+                    return bValid;
+
+                if (boardAll & boardNewRook)
+                    return bValid;
+
+                // Verify Player's own rook exists in the correct location
+                if (! (_player[ move.iPlayer ]._aBoards[ PIECE_ROOK ] & boardOldRook))
+                    return bValid;
+
+                bool bIsCheck0         = IsCheck( castle.nNewKingRF ); // FIXME: Verify enemy
+                bool bIsCheck1         = IsCheck( castle.nNewRookRF );
+                bool bPassThroughCheck = bIsCheck0 | bIsCheck1;
+                if ( bPassThroughCheck )
+                    return bValid;
+
+                // _bFlags |=  STATE_GAME_MID;
+
+                Move_t moveKing = MakeMove( move.iSrcRF      , castle.nNewKingRF );
+                Move_t moveRook = MakeMove( castle.nOldRookRF, castle.nNewRookRF );
+
+                DoMove( moveKing ); // Remove old king, place new king
+                DoMove( moveRook ); // Remove old rook, place new rook
+
+                bValid = true;
+            }
+            else // can't castle
             {
                 bitboard_t boardPotential = BitBoardMovesColorKing( move.iSrcRF );
 
@@ -682,6 +677,12 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
                     bValid = true;
                 }
             }
+
+        // King moved, can't castle anymore
+        // These 2 fields are always valid
+        //   castle.bWhichSide
+        //   castle.bCanCastle
+        SetCastledFlags( castle );
 
         return bValid;
     }
@@ -733,28 +734,24 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     {
         bool bValid = false;
 
-        int bCanCastleQ = _bFlags & STATE_CAN_CASTLE_Q_SIDE;
-        int bCanCastleK = _bFlags & STATE_CAN_CASTLE_K_SIDE;
-      //int bCanCastle  = _bFlags & STATE_CAN_CASTLE_MASK  ;
-
         if ( IsCheckPassInto( move ) )
             return bValid;
 
         if (move.iPlayerSrc == PLAYER_WHITE)
         {
-            if (bCanCastleQ && (move.iSrcRF == _A1))
-                _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+            if ((_bFlags &   STATE_CAN_CASTLE_WQ_SIDE) && (move.iSrcRF == _A1))
+                 _bFlags &= ~STATE_CAN_CASTLE_WQ_SIDE; // mark can't castle
 
-            if (bCanCastleK && (move.iSrcRF == _A8))
-                _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+            if ((_bFlags &   STATE_CAN_CASTLE_WK_SIDE) && (move.iSrcRF == _A8)) //  FIXME:  H1
+                 _bFlags &= ~STATE_CAN_CASTLE_WK_SIDE; // mark can't castle
         }
         else // PLAYER_BLACK
         {
-            if (bCanCastleQ && (move.iSrcRF == _A8))
-                _bFlags &= ~STATE_CAN_CASTLE_Q_SIDE; // mark can't castle
+            if ((_bFlags &   STATE_CAN_CASTLE_BQ_SIDE) && (move.iSrcRF == _A8))
+                 _bFlags &= ~STATE_CAN_CASTLE_BQ_SIDE; // mark can't castle
 
-            if (bCanCastleK && (move.iSrcRF == _H8))
-                _bFlags &= ~STATE_CAN_CASTLE_K_SIDE; // mark can't castle
+            if ((_bFlags &   STATE_CAN_CASTLE_BK_SIDE) && (move.iSrcRF == _H8))
+                 _bFlags &= ~STATE_CAN_CASTLE_BK_SIDE; // mark can't castle
         }
 
         bValid = true;
@@ -823,7 +820,7 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     void ResetFlags()
     {
         // Move
-        _bFlags         = 0 | STATE_CAN_CASTLE_Q_SIDE | STATE_CAN_CASTLE_K_SIDE;
+        _bFlags         = STATE_CAN_CASTLE_W | STATE_CAN_CASTLE_B;
         _bMoveType      = 0;
         _iSrcRF         = 0;
         _iDstRF         = 0;
@@ -848,16 +845,20 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
     }
 
     /** Disables Castling
-        @param bWhichCastleSide
-            0 = none
-            MOVE_CASTLED_Q_SIDE
-            MOVE_CASTLED_K_SIDE
+        @param {Castle_t} castle
+        castle.bWhichSide
+          0 = none
+          MOVE_CASTLED_Q_SIDE
+          MOVE_CASTLED_K_SIDE
+        castle.bCanCastle
+          STATE_CAN_CASTLE_W
+          STATE_CAN_CASTLE_B
     */
     // TODO: Probably should be renamed DoCastle( move, bWhichCastleSide )
-    void SetCastledFlags( int bWhichCastleSide )
+    void SetCastledFlags( const Castle_t& castle )
     {
-        _bFlags     &= ~STATE_CAN_CASTLE_MASK;
-        _bMoveType  |= bWhichCastleSide      ;
+        _bFlags     &= ~castle.bCanCastle;
+        _bMoveType  |=  castle.bWhichSide;
     }
 
 inline void    SetColorPlayer( int iColor ) { _bFlags &= ~1; _bFlags |= (iColor & 1); }

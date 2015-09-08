@@ -130,7 +130,7 @@ FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
             fen++;
 
         // SECTION_CASTLE_INFO
-        state._bFlags &= ~STATE_CAN_CASTLE_MASK;
+        state._bFlags &= ~(STATE_CAN_CASTLE_W | STATE_CAN_CASTLE_B);
         while (*fen && (*fen != ' '))
         {
 //printf( "CASTLE: %c\n", *fen );
