@@ -8,6 +8,7 @@ struct Castle_t
     uint8_t nOldRookRF;
 };
 
+// Single Move
 struct Move_t
 {
     uint8_t    iPlayer   ;
