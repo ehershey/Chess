@@ -12,10 +12,10 @@
 #include "pieces.h"
 #include "rawboard.h"
 #include "state_bitboard.h"
-#include "state.h"
+#include "state_normal.h"
+#include "state_search.h"
 #include "game.h"
 #include "eval.h"
-#include "search.h"
 
     bool gbAnsiOutput = false;
 
