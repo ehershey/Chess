@@ -846,13 +846,13 @@ inline uint8_t GetColorPlayer() { return  _bFlags &  STATE_WHICH_PLAYER; }
 
     /** Disables Castling
         @param {Castle_t} castle
+        castle.bCanCastle
+          STATE_CAN_CASTLE_W
+          STATE_CAN_CASTLE_B
         castle.bWhichSide
           0 = none
           MOVE_CASTLED_Q_SIDE
           MOVE_CASTLED_K_SIDE
-        castle.bCanCastle
-          STATE_CAN_CASTLE_W
-          STATE_CAN_CASTLE_B
     */
     // TODO: Probably should be renamed DoCastle( move, bWhichCastleSide )
     void SetCastledFlags( const Castle_t& castle )
