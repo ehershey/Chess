@@ -53,7 +53,7 @@ void StartupMulticore()
     for( int iCore = 0; iCore < gnThreadsActive; iCore++ )
     {
         nMovePool[ iCore ] = 0;
-        aMovePool[ iCore ] = new State_t[ MAX_POOL_MOVES ];
+        aMovePool[ iCore ] = new SearchState_t[ MAX_POOL_MOVES ];
 omp_init_lock(
        &aLockPool[ iCore ]
 );

@@ -319,19 +319,29 @@ Move Queue
 */
 
 const int MAX_THREADS = 8;
-const int MAX_POOL_MOVES = 4096*64; // Max is 5949~6349
+const int MAX_POOL_MOVES = 4096*MAX_SEARCH_MOVES; // Max is 5949~6349
 
 #ifdef _OPENMP
     omp_lock_t aLockPool[ MAX_THREADS ];
 #endif // OPENMP
 
-uint32_t nMovePool  [ MAX_THREADS ];
-State_t *aMovePool  [ MAX_THREADS ]; // Array of pointers to move pools
+uint32_t       nMovePool  [ MAX_THREADS ];
+SearchState_t *aMovePool  [ MAX_THREADS ]; // Array of pointers to move pools
 
 #ifdef _OPENMP
-void PushState( int iThread, State_t )
+void PushState( int iThread, SearchState_t search )
 {
+    search._state._nDepth      = 0;
+    search._state._iParent     = 0;
+    search._state._iFirstChild = 1;
+    search._state._nChildren   = 1; // TODO: FIXME: SearchState _nMoves
+
     omp_set_lock  ( &aLockPool[ iThread ] );
+
+    // #pragma OMP atomic
+        int iMove = ++nMovePool[ iThread ];
+                      aMovePool[ iThread ][ iMove ] = search;
+
     omp_unset_lock( &aLockPool[ iThread ] );
 }
 #endif // OPENMP
