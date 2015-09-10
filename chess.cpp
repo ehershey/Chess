@@ -54,6 +54,9 @@ void StartupMulticore()
     {
         nMovePool[ iCore ] = 0;
         aMovePool[ iCore ] = new State_t[ MAX_POOL_MOVES ];
+omp_init_lock(
+       &aLockPool[ iCore ]
+);
     }
 
     size_t nMemState = sizeof( State_t[ MAX_POOL_MOVES ] );
@@ -64,8 +67,9 @@ void ShutdownMulticore()
 {
     for( int iCore = 0; iCore < gnThreadsActive; iCore++ )
     {
-        delete [] aMovePool[ iCore ];
-    }
+        delete []  aMovePool[ iCore ];
+omp_destroy_lock( &aLockPool[ iCore ] );
+   }
 }
 // END OMP
 

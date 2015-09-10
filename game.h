@@ -237,8 +237,102 @@ FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
     }
 };
 
-const int MAX_THREADS = 8;
 
+/*
+  Who   - Who can read/write?
+  When  - When can the data be read or written?
+        - When does the caller need the results?
+        - When do other processes need the results?
+  What  - What data really needs to be read / written ?
+        - What are the contraints?
+          - Latency?
+          - Throughput?
+          - To data?
+          - To tranformation?
+          - To ordering?
+          - To global guarantees?
+          - To local guarantees?
+  How   - How is the data stored? Accessed?
+          How will the data be transformed? -> What are the operations?
+  Why   - Why do you need to read/write the data?
+  Where -
+
+Per Thread Queue?
+  - Insert
+  - Delete
+  - Search
+
+
+Atomic integers:
+   push_count = 0
+   pop_count  = 0
+
+Current count = push_count - pop_count
+
+Insert (Append at End)
+Delete (Node can be anywhere)
+Search (needle), return sub-list
+
+
+Insert Thread:
+   Insert count > 0?
+   - No, Wait, goto 1
+   - Yes
+     Add to source
+     Atomic push_count++
+
+Delete Thread:
+   Delete count > 0?
+   - No, Wait, goto 1
+   - Yes
+     Deref id
+     Mark source deleted
+     Atomic pop_count++
+
+Search Thread:
+   Search Command
+   Deref id
+   Deleted?
+   - Yes, Skip
+   - No, Match criteria?
+     - No, goto skip
+     - Yes, Append to result
+
+Now is not meaningfull in concurrent system
+
+Reference:
+  http://cellperformance.beyond3d.com/articles/public/concurrency_rabit_hole.pdf
+
+
+Queue Operations:
+  IsEmpty()
+  Push()
+  Pop()
+
+Move Queue
+1. Single Queue
+   Thread 0 writes
+   Thread N reads
+
+2. Queue per Core
+   Thread 0 pushes job X onto core Y
+*/
+
+const int MAX_THREADS = 8;
 const int MAX_POOL_MOVES = 4096*64; // Max is 5949~6349
+
+#ifdef _OPENMP
+    omp_lock_t aLockPool[ MAX_THREADS ];
+#endif // OPENMP
+
 uint32_t nMovePool  [ MAX_THREADS ];
 State_t *aMovePool  [ MAX_THREADS ]; // Array of pointers to move pools
+
+#ifdef _OPENMP
+void PushState( int iThread, State_t )
+{
+    omp_set_lock  ( &aLockPool[ iThread ] );
+    omp_unset_lock( &aLockPool[ iThread ] );
+}
+#endif // OPENMP
+
